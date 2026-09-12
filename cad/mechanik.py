@@ -135,7 +135,6 @@ ZAHN_VON, ZAHN_BIS = -22.0, 22.0            # Verzahnungsbereich um das Ritzel
 MOT_FLANSCH = P.MOT_FLANSCH
 MOT_L_GETRIEBE = P.MOT_L_GETRIEBE
 MOT_L_MOTOR = P.MOT_L_MOTOR
-MOT_L_BREMSE = P.MOT_L_BREMSE
 MOT_L = P.MOT_L_GESAMT
 Y_MOT = GEH_Y / 2                                            # Anbauflaeche
 
@@ -146,7 +145,13 @@ Y_MOT = GEH_Y / 2                                            # Anbauflaeche
 # die volle, weiche Form, die an Geraeten ueblich ist: fast rechteckige
 # Flaechen mit stetig gekruemmten Ecken - anders als eine Verrundung, die
 # zwischen Gerade und Kreisbogen einen Kruemmungssprung hat.
-SQ_N = 4.0                                  # Exponent der Superellipse
+# Exponent: n = 4 ist die klassische Squircle-Form. Weil sich die Superellipse
+# zu den Enden verjuengt, kostet ein kleines n Bauraum - der Antrieb muss ja
+# hineinpassen. Gerechnet (siehe _halbachsen) ergibt sich die Bautiefe:
+#     n = 4 -> 136 mm    n = 5 -> 127    n = 6 -> 122    n = 8 -> 117
+# Gewaehlt ist n = 6: 14 mm schlanker als n = 4 und optisch noch deutlich vom
+# Rechteck entfernt. Der Wert ist der einzige Stellhebel dieser Abwaegung.
+SQ_N = 6.0                                  # Exponent der Superellipse
 SQ_PUNKTE = 240                             # Stuetzstellen des Profils
 
 # Halbachsen HERGELEITET, nicht gewaehlt:
@@ -158,13 +163,21 @@ WAND_SQ = 6.0                               # mm Wandstaerke Alu, gefraest
 WAND_VERK = 3.0                             # mm Wandstaerke Verkleidung, SLS-Druck
 
 
-def squircle(a, c, n=SQ_N, punkte=SQ_PUNKTE):
-    """Punkte einer Superellipse mit den Halbachsen a und c."""
+def squircle(a_p, c, a_m=None, n=SQ_N, punkte=SQ_PUNKTE):
+    """Punkte einer Superellipse, in +y und -y unterschiedlich weit.
+
+    a_m = a_p ergibt die symmetrische Form. Sind die Halbachsen verschieden,
+    treffen sich beide Haelften bei y = 0 auf z = +-c. Dort verlaeuft die
+    Superellipse waagerecht (dz/dy = 0), die Tangente ist also stetig - die
+    Form bleibt an der Nahtstelle knickfrei.
+    """
     from math import cos, sin, pi, copysign
+    a_m = a_p if a_m is None else a_m
     aus = []
     for i in range(punkte):
         t = 2 * pi * i / punkte
         ct, st = cos(t), sin(t)
+        a = a_p if ct >= 0 else a_m
         aus.append((copysign(abs(ct) ** (2.0 / n), ct) * a,
                     copysign(abs(st) ** (2.0 / n), st) * c))
     return aus
@@ -184,16 +197,74 @@ AUSL_QUER = MOT_FLANSCH * 2 ** 0.5 + 2 * WAND_AUSL
 # Squircle-Halbachsen aus Antrieb und Mechanik
 # Der Antrieb kann erst NACH der Mechanik beginnen: die Zahnstangen belegen
 # +-SCHL_B/2 um die Mittelebene. Diese Breite gehoert in die Halbachse.
-SQ_A = SCHL_B / 2 + 3.0 + MOT_L + WAND_SQ                   # Y-Halbachse
+Y_MOT_INNEN = SCHL_B / 2 + 3.0                              # Motorsitz  (+Y)
+Y_BRE_INNEN = -(SCHL_B / 2 + 3.0)                           # Bremssitz  (-Y)
+Y_TRAEGER = SCHL_B / 2 + 8.0                                # zentraler Traeger
+
+# HALBACHSEN AUS DER EINSCHLUSSBEDINGUNG, nicht aus einer Summe.
+#
+# Eine Superellipse verjuengt sich zu ihren Enden hin. Am Ende des Motors ist
+# die Schale also nicht mehr so hoch wie in der Mitte - eine simple Addition
+# "Sitz + Antriebslaenge + Wand" liefert deshalb ein zu kleines Profil, in dem
+# der Motor mit seinen Ecken in der Wand steckt. Genau das ist passiert.
+#
+# Richtig ist: jedes Einbauteil liefert einen Eckpunkt (y, z), den die INNERE
+# Superellipse noch umschliessen muss:
+#
+#     (y/a)^n + (z/c)^n <= 1
+#
+# Nach a aufgeloest und ueber alle Einbauteile maximiert. Weil c von denselben
+# Punkten abhaengt, wird beides iterativ bestimmt.
+#
+# Der Exponent n steuert dabei den Handel zwischen Form und Bauraum: je
+# groesser n, desto rechteckiger das Profil und desto weniger verjuengt es
+# sich - und desto schlanker darf es bei gleichem Inhalt sein.
+Y_MOT_ENDE = SCHL_B / 2 + 3.0 + 1.0 + MOT_L                 # Aussenkante Motor
+Y_BRE_ENDE = SCHL_B / 2 + 3.0 + 1.0 + P.BREMSE_L            # Aussenkante Bremse
+SPIEL_VERK = 1.0                                            # mm Luft zum Einbau
+
+#                     y            z                        Seite
+EINBAU_P = [(Y_TRAEGER,     H_KOERPER / 2),                 # Funktionstraeger
+            (Y_MOT_ENDE,    MOT_FLANSCH / 2)]               # Motor
+EINBAU_M = [(Y_TRAEGER,     H_KOERPER / 2),                 # Funktionstraeger
+            (Y_BRE_ENDE,    P.BREMSE_D / 2)]                # Haltebremse
+
+
+def _halbachsen(n=SQ_N):
+    """Innere Halbachsen (a+, a-, c), die alle Einbauteile umschliessen."""
+    pkt = [(y + SPIEL_VERK, z + SPIEL_VERK) for y, z in EINBAU_P + EINBAU_M]
+    c = max(z for _, z in pkt) + 0.1
+    a_p = a_m = max(y for y, _ in pkt) + 0.1
+    for _ in range(200):
+        def loese_a(liste):
+            a = 0.0
+            for y, z in liste:
+                rest = 1.0 - (z / c) ** n
+                a = max(a, y / rest ** (1.0 / n) if rest > 1e-9 else 1e9)
+            return a
+        a_p = loese_a([(y + SPIEL_VERK, z + SPIEL_VERK) for y, z in EINBAU_P])
+        a_m = loese_a([(y + SPIEL_VERK, z + SPIEL_VERK) for y, z in EINBAU_M])
+        c_neu = c
+        for (y, z), a in [(pkt[0], a_p), (pkt[1], a_p), (pkt[2], a_m), (pkt[3], a_m)]:
+            rest = 1.0 - (y / a) ** n
+            if rest > 1e-9:
+                c_neu = max(c_neu, z / rest ** (1.0 / n))
+        if abs(c_neu - c) < 1e-6:
+            break
+        c = c_neu
+    return a_p, a_m, c
+
+
+_A_P, _A_M, _C = _halbachsen()
+SQ_C = _C + WAND_VERK
+SQ_A_P = _A_P + WAND_VERK                                   # Antriebsseite
+SQ_A_M = _A_M + WAND_VERK                                   # Bremsseite
+SQ_A = max(SQ_A_P, SQ_A_M)                                  # fuer Nachweise
 # Z-Halbachse: die Schale muss den Funktionstraeger mit Spiel umschliessen.
 # Der NEMA-Flansch ist quadratisch und steht ACHSPARALLEL im Gehaeuse - nicht
 # auf der Ecke. Massgebend ist deshalb MOT_FLANSCH/2, nicht die Diagonale.
 # Die frueher angesetzte Diagonale hat die Verkleidung um 17 mm zu hoch
 # gemacht; das war der groesste Einzelfehler in der Hoehenkette.
-SPIEL_VERK = 1.0                            # mm Luft Traeger -> Schale
-SQ_C = max(H_KOERPER / 2.0, MOT_FLANSCH / 2.0) + SPIEL_VERK + WAND_VERK
-Y_MOT_INNEN = SCHL_B / 2 + 3.0                              # Motorsitz
-Y_TRAEGER = SCHL_B / 2 + 8.0                                # zentraler Traeger
 Y_AUSL_MOT = Y_MOT - 10.0 + MOT_L + 6.0     # Aussenkante Motorausleger
 Y_AUSL_EL = 46.0                            # Laenge Elektronikausleger
 R_AUSSEN = 10.0                             # Radius der senkrechten Aussenkanten
@@ -221,6 +292,12 @@ def gehaeuse():
         H_KOERPER / 2, 14, align=CU)
     p -= Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
         MOT_FLANSCH / 2 - 3, 20, align=CU)
+
+    # Bremsflansch auf der Gegenseite, gleiche Bauart
+    p += Pos(0, Y_BRE_INNEN, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
+        H_KOERPER / 2, 14, align=CU)
+    p -= Pos(0, Y_BRE_INNEN, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
+        P.BREMSE_D / 2 + 0.2, 20, align=CU)   # Aufnahmebohrung, H7-Sitz
 
     # Fuehrungstaschen, je Zahnstange getrennt und in X begrenzt
     p -= Pos((RACK_VON + X_R) / 2, 0, Z_RACK_O) * Box(
@@ -259,19 +336,18 @@ def verkleidung():
     """
     from build123d import Polyline, make_face, extrude, Plane
 
-    def schale(a, c, laenge):
-        k = Polyline(*[(y, z) for y, z in squircle(a, c)], close=True)
+    def schale(a_p, a_m, c, laenge):
+        k = Polyline(*[(y, z) for y, z in squircle(a_p, c, a_m)], close=True)
         return extrude(Plane.YZ * make_face(k), amount=laenge / 2, both=True)
 
-    p = Pos(0, 0, Z_ACHSE) * schale(SQ_A, SQ_C, GEH_X)
-    p -= Pos(0, 0, Z_ACHSE) * schale(SQ_A - WAND_VERK, SQ_C - WAND_VERK,
-                                     GEH_X - 2 * WAND_VERK)
+    p = Pos(0, 0, Z_ACHSE) * schale(SQ_A_P, SQ_A_M, SQ_C, GEH_X)
+    p -= Pos(0, 0, Z_ACHSE) * schale(SQ_A_P - WAND_VERK, SQ_A_M - WAND_VERK,
+                                     SQ_C - WAND_VERK, GEH_X - 2 * WAND_VERK)
 
-    # Innentasche fuer den Antrieb. Sie endet 0,5 mm vor der Innenflaeche der
-    # Schale - der Motor darf sich nicht abzeichnen, die Wand bleibt geschlossen.
-    l_tasche = (SQ_A - WAND_VERK - 0.5) - Y_MOT_INNEN
-    p -= Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
-        MOT_FLANSCH / 2 + 6, l_tasche, align=CU)
+    # Keine Freistellung fuer Motor oder Bremse: die Halbachsen sind so
+    # bestimmt, dass beide von selbst hineinpassen (siehe _halbachsen). Eine
+    # zusaetzliche Tasche wuerde die Schale nur durchbrechen - genau das ist
+    # in der Fassung davor passiert, der Motor war durch das Loch zu sehen.
 
     # Durchbruch oben fuer den Schnellwechsler: nur durch die Deckflaeche,
     # Ø58 Zukaufteil plus 2 mm Fuge.
@@ -317,8 +393,9 @@ def ritzelwelle():
     """Pos.6 - Ritzelwelle, im Gehaeuse gelagert, Abtrieb zum Getriebe."""
     # Endet buendig an der Anbauflaeche des Motors - der Getriebeabtrieb
     # kuppelt dort an, beide duerfen sich nicht durchdringen.
-    return Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        D_WELLE / 2, 2 * (Y_MOT_INNEN + 1), align=CC)
+    y_p, y_m = Y_MOT_INNEN + 1.0, Y_BRE_INNEN - 1.0
+    return Pos(0, (y_p + y_m) / 2, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
+        D_WELLE / 2, y_p - y_m, align=CC)
 
 
 def _zahnstange(oben, offen):
@@ -391,9 +468,26 @@ def motor():
         36.0 / 2, MOT_L_GETRIEBE, align=CC)                       # Getriebe
     p += Pos(0, y0 + MOT_L_GETRIEBE + MOT_L_MOTOR / 2, Z_ACHSE) * \
         Box(MOT_FLANSCH, MOT_L_MOTOR, MOT_FLANSCH, align=CC)      # Motor
-    p += Pos(0, y0 + MOT_L_GETRIEBE + MOT_L_MOTOR + MOT_L_BREMSE / 2, Z_ACHSE) * \
-        Rot(90, 0, 0) * Cylinder(38.0 / 2, MOT_L_BREMSE, align=CC)  # Bremse
     return p
+
+
+def bremse():
+    """Pos.12 - Federkraft-Haltebremse auf dem freien Ritzelwellenende.
+
+    Stromlos eingefallen; das Zahnstangengetriebe ist nicht selbsthemmend.
+
+    Sie sitzt jetzt VOR dem Getriebe und muss deshalb das volle Ritzelmoment
+    halten statt nur ein Fuenftel davon - sie wird dadurch groesser. Dafuer
+    nutzt sie den Raum, der auf der Gegenseite der Ritzelachse ohnehin frei
+    war: die Bautiefe sinkt von 176 auf 114 mm.
+
+    Zweiter Vorteil: sie greift direkt am Ritzel an, nicht hinter fuenf
+    Getriebestufen. Das Getriebespiel liegt damit nicht mehr zwischen Bremse
+    und Last.
+    """
+    y0 = Y_BRE_INNEN - 1.0
+    return Pos(0, y0 - P.BREMSE_L / 2, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
+        P.BREMSE_D / 2, P.BREMSE_L, align=CC)
 
 
 if __name__ == "__main__":
@@ -412,7 +506,8 @@ if __name__ == "__main__":
              ("Ritzelwelle", ritzelwelle(), 7.85),
              ("Zahnstange oben", zahnstange(1), 7.85),
              ("Zahnstange unten", zahnstange(-1), 7.85),
-             ("Motoreinheit", motor(), 3.00)]
+             ("Motoreinheit", motor(), 3.00),
+             ("Haltebremse", bremse(), 3.00)]
     mg = 0.0
     for n, k, rho in teile:
         v = k.volume / 1000.0

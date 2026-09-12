@@ -35,6 +35,7 @@ FARBE = {
     "9":  "0.72 0.75 0.80 1",    # Greiferzange
     "10": "0.15 0.15 0.17 1",    # Weichbacke NBR
     "11": "0.11 0.11 0.12 1",    # Verkleidung, schwarzes PA12 (SLS)
+    "12": "0.30 0.34 0.40 1",    # Haltebremse
 }
 
 

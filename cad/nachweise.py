@@ -105,13 +105,23 @@ masse("Gehaeusehoehe", M.H_KOERPER, "mm",
          P.MOT_FLANSCH, M.WAND_TRAEGER, M.H_MOTOR_GES))
 
 masse("Halbachse Verkleidung z", M.SQ_C, "mm",
-      "groesser von Traeger %.1f und Motorflansch %.0f, plus %.0f Spiel "
-      "und %.0f Wand; der NEMA-Flansch steht achsparallel, seine Diagonale "
-      "ist NICHT massgebend"
-      % (M.H_KOERPER / 2, P.MOT_FLANSCH / 2, M.SPIEL_VERK, M.WAND_VERK))
-masse("Halbachse Verkleidung y", M.SQ_A, "mm",
-      "Zahnstange %.0f/2 + %.0f Sitz + Antrieb %.0f + %.0f Wand"
-      % (M.SCHL_B, 3.0, M.MOT_L, M.WAND_SQ))
+      "Einschlussbedingung (y/a)^%.0f + (z/c)^%.0f <= 1 fuer Traeger "
+      "(%.0f|%.1f), Motor (%.0f|%.0f) und Bremse (%.0f|%.0f), plus %.0f Wand"
+      % (M.SQ_N, M.SQ_N, M.Y_TRAEGER, M.H_KOERPER / 2,
+         M.Y_MOT_ENDE, P.MOT_FLANSCH / 2, M.Y_BRE_ENDE, P.BREMSE_D / 2,
+         M.WAND_VERK))
+masse("Halbachse Verkleidung +y", M.SQ_A_P, "mm",
+      "Antriebsseite: Motor mit Getriebe endet bei y = %.0f" % M.Y_MOT_ENDE)
+masse("Halbachse Verkleidung -y", M.SQ_A_M, "mm",
+      "Bremsseite: Haltebremse endet bei y = -%.0f" % M.Y_BRE_ENDE)
+masse("Bautiefe Greifer", M.SQ_A_P + M.SQ_A_M, "mm",
+      "Bremse auf dem freien Wellenende statt hinter dem Motor, Profil "
+      "dadurch asymmetrisch; Exponent n = %.0f (n = 4 ergaebe 136 mm)"
+      % M.SQ_N)
+masse("Haltemoment Bremse", P.BREMSE_M_NOETIG, "Nm",
+      "sitzt VOR dem Getriebe, haelt deshalb das volle Ritzelmoment "
+      "2 x %.1f N x %.0f mm / eta; gewaehlt %.1f Nm"
+      % (P.F_GREIF, P.R_TEILKREIS, P.BREMSE_M_NENN))
 masse("Bauhoehe Greifer gesamt", M.Z_ZANGE + P.ZANGE_L, "mm",
       "Flansch -> Wechsler %.0f + Traeger %.1f + Flansch %.0f + Kopf %.0f "
       "+ Zange %.0f" % (M.Z_KOERPER, M.H_KOERPER, M.T_FLANSCH,

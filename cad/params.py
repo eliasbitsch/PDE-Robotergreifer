@@ -126,13 +126,27 @@ GETRIEBE_ETA = 0.90                 # -
 # elektromagnetischer Federkraftbremse - kompakter als drei Einzelbaugruppen.
 MOT_L_GETRIEBE = 30.0               # mm
 MOT_L_MOTOR = 20.0                  # mm  NEMA 17 Pancake
-MOT_L_BREMSE = 21.0                 # mm
-MOT_L_GESAMT = MOT_L_GETRIEBE + MOT_L_MOTOR + MOT_L_BREMSE   # 85 mm
+MOT_L_GESAMT = MOT_L_GETRIEBE + MOT_L_MOTOR                  # 50 mm, Seite +Y
 MOT_FLANSCH = 42.0                  # mm  NEMA 17
+
+# BREMSE AUF DEM FREIEN WELLENENDE, nicht hinter dem Motor.
+# Sass die Bremse hinter dem Motor, lag der gesamte Antrieb auf einer Seite
+# der Ritzelachse: 30 + 20 + 21 = 71 mm. Die Gegenseite blieb leer und wurde
+# von der symmetrischen Aussenform trotzdem mitgebaut - 176 mm Bautiefe fuer
+# 71 mm Antrieb. Auf dem freien Wellenende nutzt die Bremse den leeren Raum.
+#
+# Preis: sie bremst jetzt VOR dem Getriebe und muss deshalb das volle
+# Ritzelmoment halten statt nur ein Fuenftel davon.
 
 # Die Zange muss die volle Kraft aushalten, die der Antrieb aufbringen kann.
 # Sie ergibt sich aus dem Motormoment, nicht aus der Haltekraft.
 M_ABTRIEB = MOTOR_M_NENN * GETRIEBE_I * GETRIEBE_ETA          # Nm am Ritzel
+
+# Haltemoment der Bremse: sie muss die Greifkraft beider Backen halten.
+BREMSE_M_NOETIG = 2 * F_GREIF * R_TEILKREIS / 1000.0 / ETA_GETRIEBE   # Nm
+BREMSE_M_NENN = 0.4                 # Nm, naechste Baugroesse Federkraftbremse
+BREMSE_L = 30.0                     # mm Baulaenge fuer dieses Moment
+BREMSE_D = 40.0                     # mm Aussendurchmesser
 GREIFER_F_MAX = M_ABTRIEB * 1000.0 / R_TEILKREIS / 2.0 * ETA_GETRIEBE   # N je Backe
 
 # MASSGEBLICHER LASTFALL FUER DIE ZANGE

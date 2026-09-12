@@ -139,10 +139,11 @@ STUECKLISTE = [
     ("5",  "Ritzel m=1 z=20",               1, "16MnCr5 einsatzgeh.", 7.85, lambda s=1: M.ritzel()),
     ("6",  "Ritzelwelle",                   1, "1.7225",             7.85, lambda s=1: M.ritzelwelle()),
     ("7",  "Zahnstange mit Backenflansch",  2, "16MnCr5 einsatzgeh.", 7.85, M.zahnstange),
-    ("8",  "Servomotor mit Getriebe/Bremse", 1, "Zukaufteil",        3.00, lambda s=1: M.motor()),
+    ("8",  "Servomotor mit Planetengetriebe", 1, "Zukaufteil",        3.00, lambda s=1: M.motor()),
     ("9",  "Greiferzange",                  2, P.ZANGE_WERKSTOFF,    2.80, zange),
     ("10", "Weichbacke",                    2, "NBR 70 Shore A",     1.35, weichbacke),
     ("11", "Verkleidung",                   1, "PA12 schwarz, SLS",  1.01, lambda s=1: M.verkleidung()),
+    ("12", "Haltebremse am Ritzel",         1, "Zukaufteil",         3.00, lambda s=1: M.bremse()),
 ]
 
 # Positionen, die doppelt vorkommen (links/rechts)
