@@ -24,6 +24,14 @@ import build123d as bd
 import greifer as G
 import params as P
 
+# Im Modell liegt der Roboterflansch bei z = 0 und +Z zeigt zum Bauteil - die
+# Zange zeigt also in +Z. In der Zeichnung soll der Greifer haengen, wie er am
+# Roboter haengt: Flansch oben, Zange nach unten. Dafuer wird die Baugruppe vor
+# dem Projizieren um 180 Grad um X gedreht. Die Drehung gilt fuer ALLE
+# Ansichten und fuer die Hinweislinien, sonst laufen Geometrie und
+# Positionsnummern auseinander.
+DARSTELLUNG = bd.Rot(180, 0, 0)
+
 OUT = os.path.join(HIER, "..", "out")
 os.makedirs(OUT, exist_ok=True)
 
@@ -123,7 +131,7 @@ def zeichne(ax, sicht, x0, y0, massstab, mit_verdeckt=True):
     for key, pos, bez, k in G.alle_koerper():
         if pos in lagen:          # bei Paaren genuegt eine Hinweislinie
             continue
-        d3 = bbox_mitte(k) - c_ges
+        d3 = bbox_mitte(DARSTELLUNG * k) - c_ges
         lagen[pos] = np.array([np.dot(d3, ex), np.dot(d3, ey)]) * massstab \
             + np.array([x0, y0])
     return lagen
@@ -136,6 +144,7 @@ def baugruppe():
     if "ges" not in _CACHE:
         ges = None
         for key, pos, name, k in G.alle_koerper():
+            k = DARSTELLUNG * k
             ges = k if ges is None else ges + k
         _CACHE["ges"] = ges
     return _CACHE["ges"]

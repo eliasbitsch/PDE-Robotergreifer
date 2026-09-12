@@ -152,7 +152,8 @@ Y_MOT = GEH_Y / 2                                            # Anbauflaeche
 # Gewaehlt ist n = 6: 14 mm schlanker als n = 4 und optisch noch deutlich vom
 # Rechteck entfernt. Der Wert ist der einzige Stellhebel dieser Abwaegung.
 SQ_N = 6.0                                  # Exponent der Superellipse
-SQ_PUNKTE = 240                             # Stuetzstellen des Profils
+SQ_PUNKTE = 96                              # Stuetzstellen des Spline-Profils
+                                            # (Flaechenfehler < 0,05 % gegen 240)
 
 # Halbachsen HERGELEITET, nicht gewaehlt:
 #   a  Baulaenge des Antriebs + Wand; der Antrieb muss vollstaendig hinein,
@@ -334,10 +335,16 @@ def verkleidung():
 
     Oeffnungen: oben fuer den Schnellwechsler, unten fuer die Greiferzangen.
     """
-    from build123d import Polyline, make_face, extrude, Plane
+    from build123d import Spline, make_face, extrude, Plane
 
     def schale(a_p, a_m, c, laenge):
-        k = Polyline(*[(y, z) for y, z in squircle(a_p, c, a_m)], close=True)
+        # Periodischer Spline durch die Stuetzstellen, KEIN Polygonzug.
+        # Ein 240-Eck erzeugt 240 Regelflaechen; in der Zeichnung projiziert
+        # jede davon eine eigene Kante, die Ansichten liefen schwarz zu.
+        # Der Spline ergibt eine einzige Flaeche - und die STEP-Datei
+        # beschreibt damit die Kurve, statt sie zu facettieren.
+        k = Spline(*[(y, z) for y, z in squircle(a_p, c, a_m, punkte=SQ_PUNKTE)],
+                   periodic=True)
         return extrude(Plane.YZ * make_face(k), amount=laenge / 2, both=True)
 
     p = Pos(0, 0, Z_ACHSE) * schale(SQ_A_P, SQ_A_M, SQ_C, GEH_X)
