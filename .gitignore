@@ -1,0 +1,5 @@
+out/mesh/
+out/fem/
+onshape/endpoints.json
+*.pyc
+__pycache__/

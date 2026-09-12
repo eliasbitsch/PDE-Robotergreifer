@@ -1,0 +1,89 @@
+<?xml version='1.0'?>
+<robot name='generic6r'>
+  <link name="base">
+    <visual><origin xyz="0 0 0.2"/>
+      <geometry><cylinder radius="0.16" length="0.4"/></geometry>
+      <material name="m_base"><color rgba="0.25 0.25 0.28 1"/></material></visual>
+    <collision><origin xyz="0 0 0.2"/>
+      <geometry><cylinder radius="0.16" length="0.4"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="shoulder">
+    <visual><origin xyz="0 0 0.09"/>
+      <geometry><cylinder radius="0.13" length="0.18"/></geometry>
+      <material name="m_shoulder"><color rgba="1.0 0.45 0.05 1"/></material></visual>
+    <collision><origin xyz="0 0 0.09"/>
+      <geometry><cylinder radius="0.13" length="0.18"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="upperarm">
+    <visual><origin xyz="0 0 0.325"/>
+      <geometry><cylinder radius="0.1" length="0.65"/></geometry>
+      <material name="m_upperarm"><color rgba="1.0 0.45 0.05 1"/></material></visual>
+    <collision><origin xyz="0 0 0.325"/>
+      <geometry><cylinder radius="0.1" length="0.65"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="forearm">
+    <visual><origin xyz="0 0 0.275"/>
+      <geometry><cylinder radius="0.085" length="0.55"/></geometry>
+      <material name="m_forearm"><color rgba="1.0 0.45 0.05 1"/></material></visual>
+    <collision><origin xyz="0 0 0.275"/>
+      <geometry><cylinder radius="0.085" length="0.55"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="wrist1">
+    <visual><origin xyz="0 0 0.06"/>
+      <geometry><cylinder radius="0.07" length="0.12"/></geometry>
+      <material name="m_wrist1"><color rgba="1.0 0.45 0.05 1"/></material></visual>
+    <collision><origin xyz="0 0 0.06"/>
+      <geometry><cylinder radius="0.07" length="0.12"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="wrist2">
+    <visual><origin xyz="0 0 0.075"/>
+      <geometry><cylinder radius="0.06" length="0.15"/></geometry>
+      <material name="m_wrist2"><color rgba="1.0 0.45 0.05 1"/></material></visual>
+    <collision><origin xyz="0 0 0.075"/>
+      <geometry><cylinder radius="0.06" length="0.15"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="flange">
+    <visual><origin xyz="0 0 0.02"/>
+      <geometry><cylinder radius="0.055" length="0.04"/></geometry>
+      <material name="m_flange"><color rgba="0.2 0.2 0.2 1"/></material></visual>
+    <collision><origin xyz="0 0 0.02"/>
+      <geometry><cylinder radius="0.055" length="0.04"/></geometry></collision>
+    <inertial><mass value="5"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="A1" type="revolute">
+    <parent link="base"/><child link="shoulder"/>
+    <origin xyz="0 0 0.4"/><axis xyz="0 0 1"/>
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="500" velocity="4.0"/>
+  </joint>
+  <joint name="A2" type="revolute">
+    <parent link="shoulder"/><child link="upperarm"/>
+    <origin xyz="0 0 0.18"/><axis xyz="0 1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="500" velocity="4.0"/>
+  </joint>
+  <joint name="A3" type="revolute">
+    <parent link="upperarm"/><child link="forearm"/>
+    <origin xyz="0 0 0.65"/><axis xyz="0 1 0"/>
+    <limit lower="-2.6" upper="2.6" effort="500" velocity="4.0"/>
+  </joint>
+  <joint name="A4" type="revolute">
+    <parent link="forearm"/><child link="wrist1"/>
+    <origin xyz="0 0 0.55"/><axis xyz="0 0 1"/>
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="500" velocity="4.0"/>
+  </joint>
+  <joint name="A5" type="revolute">
+    <parent link="wrist1"/><child link="wrist2"/>
+    <origin xyz="0 0 0.12"/><axis xyz="0 1 0"/>
+    <limit lower="-2.2" upper="2.2" effort="500" velocity="4.0"/>
+  </joint>
+  <joint name="A6" type="revolute">
+    <parent link="wrist2"/><child link="flange"/>
+    <origin xyz="0 0 0.15"/><axis xyz="0 0 1"/>
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="500" velocity="4.0"/>
+  </joint>
+</robot>
