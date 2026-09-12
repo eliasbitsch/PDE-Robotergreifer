@@ -132,8 +132,11 @@ import math
 I_y = P.ZANGE_B * P.ZANGE_H ** 3 / 12
 f_zange = (P.F_ZANGE_AUSLEGUNG * A_LAST ** 2 / (6 * P.ZANGE_E * I_y)
            * (3 * P.ZANGE_L - A_LAST))
-E_NBR = 5.0            # MPa, NBR 70 Shore A
-f_belag = P.F_ZANGE_AUSLEGUNG / (P.BACKE_LAENGE * P.BACKE_BREITE) * 8.0 / E_NBR
+f_belag = P.ZANGE_F_BELAG
+masse("Zangendicke h", P.ZANGE_H, "mm",
+      "kleinster Wert, der f_zange <= f_belag haelt: h_noetig = %.2f mm, "
+      "aufgerundet. NICHT aus der Festigkeit - die liefert Sicherheit > 40"
+      % P._h_noetig)
 masse("Zangendurchbiegung", f_zange, "mm",
       "massgebend ist die Steifigkeit, nicht die Festigkeit (S = %.0f): "
       "die Zange darf sich nicht staerker verformen als der Weichbelag "

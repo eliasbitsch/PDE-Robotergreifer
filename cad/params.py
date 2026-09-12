@@ -169,7 +169,6 @@ ZANGE_S_ZUL = 2.0                   # -    Sicherheit gegen Fliessen
 ZANGE_SIGMA_ZUL = ZANGE_RP02 / ZANGE_S_ZUL   # MPa
 
 ZANGE_B = 25.0                      # mm  Breite (quer zur Lastrichtung)
-ZANGE_H = 8.0                       # mm  Dicke (in Lastrichtung, = Biegerichtung)
 ZANGE_FILLET = 3.0                  # mm  Ausrundung an der Einspannung
 
 # Lasteinleitung: Weichbacke sitzt in einer Tasche am freien Ende
@@ -193,6 +192,30 @@ LUFT_BAUTEIL = 10.0                 # mm Abstand Zangenkopf -> Bauteiloberseite
 ZANGE_L = LUFT_BAUTEIL + (B_BBOX[2] - BACKE_LAENGE) / 2.0 + BACKE_LAENGE
 # Kraftangriff = Mitte der Weichbacke, gemessen ab der Einspannung
 ZANGE_A_LAST = ZANGE_L - BACKE_LAENGE / 2.0
+
+# ZANGENDICKE AUS DER STEIFIGKEIT, NICHT AUS DER FESTIGKEIT.
+#
+# Der Festigkeitsnachweis ist hier kein Auslegungskriterium: er liefert
+# Sicherheiten jenseits von 40, die Zange wuerde auch mit 3 mm halten.
+# Massgebend ist etwas anderes - die Zange darf sich unter der Greifkraft
+# nicht staerker verformen als der Weichbelag, auf dem sie aufliegt.
+# Andernfalls bestimmt die Zangenfederung die Greifkraft mit, und die
+# geregelte Kraft des Servoantriebs waere wertlos.
+#
+#   Weichbelag (NBR 70 Shore A, E ~ 5 MPa), Druck auf die Backenflaeche:
+#       f_belag = F / A_backe * t_belag / E
+#   Zange als Kragarm mit Einzelkraft im Abstand a:
+#       f_zange = F a^2 (3L - a) / (6 E I),    I = b h^3 / 12
+#
+# Gleichgesetzt und nach h aufgeloest, auf volle mm aufgerundet.
+NBR_E = 5.0                         # MPa  E-Modul NBR 70 Shore A
+NBR_T = 8.0                         # mm   Dicke des Weichbelags
+_f_belag = F_ZANGE_AUSLEGUNG / (BACKE_LAENGE * BACKE_BREITE) * NBR_T / NBR_E
+_h_noetig = (F_ZANGE_AUSLEGUNG * ZANGE_A_LAST ** 2 * (3 * ZANGE_L - ZANGE_A_LAST)
+             / (6 * ZANGE_E * _f_belag) * 12 / ZANGE_B) ** (1.0 / 3.0)
+from math import ceil as _ceil
+ZANGE_H = float(_ceil(_h_noetig))   # mm  Dicke (in Lastrichtung = Biegerichtung)
+ZANGE_F_BELAG = _f_belag            # mm  zulaessige Durchbiegung
 
 if __name__ == "__main__":
     print("GRUPPE %d - BAUTEIL %s (PA 6)" % (GRUPPE, BAUTEIL))

@@ -64,7 +64,10 @@ def main():
     print("=" * 74)
     print("%-42s %12s %12s" % ("", "analytisch", "FEM"))
     print("-" * 74)
-    print("%-42s %12.2f %12.2f" % ("Nennbiegespannung sig_n [MPa]", ana["sig_nenn"], float("nan")))
+    # Die FEM kennt keine Nennspannung - sie rechnet die Kerbe mit, statt sie
+    # ueber eine Formzahl aufzuschlagen. Die Spalte bleibt deshalb leer.
+    print("%-42s %12.2f %12s" % ("Nennbiegespannung sig_n [MPa]",
+                                 ana["sig_nenn"], "-"))
     print("%-42s %12.2f %12.2f" % ("Vergleichsspannung sig_v,max [MPa]", ana["sig_max"], s_fem))
     print("%-42s %12.3f %12.3f" % ("Verformung u_max [mm]", ana["f_spitze"], u_fem))
     print("%-42s %12.2f %12.2f" % ("Sicherheit gegen Rp0,2", ana["S"], P.ZANGE_RP02 / s_fem))
