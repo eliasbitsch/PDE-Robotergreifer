@@ -94,7 +94,13 @@ FLANSCH_NORM = "ISO 9409-1-50-4-M6"
 #   Ausserdem braucht der Schnellwechsler elektrische Kontakte statt einer
 #   Luftkupplung.
 GREIFER_TYP = "Eigenkonstruktion, Zahnstange-Ritzel, Servomotor"
-GREIFER_HUB = 12.0                  # mm je Backe (Auswahlkriterium, nicht die Kraft)
+# Backenhub GEOMETRISCH hergeleitet, nicht geschaetzt:
+# Bauteil B ist B_BBOX[0] = 95 mm breit, gegriffen wird auf GREIF_ABSTAND = 70 mm.
+# Die Backen muessen also ueber die Vorspruenge hinaus oeffnen:
+#     (95 - 70) / 2 = 12,5 mm  plus Freigang
+# Mit den urspruenglichen 12 mm waere der Greifer beim Einfahren angestossen.
+FREIGANG = 1.5                      # mm seitliche Luft je Seite
+GREIFER_HUB = (B_BBOX[0] - GREIF_ABSTAND) / 2.0 + FREIGANG
 
 # Verzahnung. z = 20 liegt ueber der Grenzzaehnezahl 17, damit ist keine
 # Profilverschiebung noetig.
@@ -105,10 +111,24 @@ R_TEILKREIS = MODUL * Z_RITZEL / 2.0                 # mm
 ETA_GETRIEBE = 0.92                 # - Wirkungsgrad Zahnstange-Ritzel
 
 # Antrieb
-MOTOR_TYP = "Schrittmotor NEMA 17 mit Haltebremse"
-MOTOR_M_NENN = 0.45                 # Nm Haltemoment
+# Motorauswahl belegt in nachweise.py: Bedarf 0,069 Nm. Der NEMA 17 Pancake
+# ist die flachste reale Baugroesse, die die geforderte Reserve von 2,0 haelt
+# (NEMA 14 schafft nur 1,4x). Gleicher Flansch wie der Standard-NEMA-17, aber
+# nur 20 statt 34-48 mm Baulaenge - das entscheidet ueber die Gehaeuseform.
+MOTOR_TYP = "Schrittmotor NEMA 17 Pancake mit Planetengetriebe und Haltebremse"
+MOTOR_M_NENN = 0.16                 # Nm Haltemoment (Pancake-Bauform)
 GETRIEBE_I = 5.0                    # - Planetengetriebe
 GETRIEBE_ETA = 0.90                 # -
+
+# Baulaengen der Antriebseinheit. Die Gesamtlaenge bestimmt die Gestaltung des
+# Gehaeuses: je laenger der Antrieb, desto weiter kragt er aus.
+# Gewaehlt ist eine Ausfuehrung mit angebautem Planetengetriebe und
+# elektromagnetischer Federkraftbremse - kompakter als drei Einzelbaugruppen.
+MOT_L_GETRIEBE = 30.0               # mm
+MOT_L_MOTOR = 20.0                  # mm  NEMA 17 Pancake
+MOT_L_BREMSE = 21.0                 # mm
+MOT_L_GESAMT = MOT_L_GETRIEBE + MOT_L_MOTOR + MOT_L_BREMSE   # 85 mm
+MOT_FLANSCH = 42.0                  # mm  NEMA 17
 
 # Die Zange muss die volle Kraft aushalten, die der Antrieb aufbringen kann.
 # Sie ergibt sich aus dem Motormoment, nicht aus der Haltekraft.

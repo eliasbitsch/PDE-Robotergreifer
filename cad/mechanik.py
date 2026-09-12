@@ -49,10 +49,15 @@ import params as P
 
 C = (Align.CENTER, Align.CENTER, Align.MIN)
 CC = (Align.CENTER, Align.CENTER, Align.CENTER)
+CU = (Align.CENTER, Align.CENTER, Align.MIN)
 
 # ---------------------------------------------------------------- Ebenen in Z
 Z_KOERPER = 40.0
-H_KOERPER = 55.0
+# Gehaeusehoehe HERGELEITET: der zylindrische Ausleger hat den Durchmesser
+# AUSL_QUER und ist mittig auf der Ritzelachse. Damit er nicht oben aus dem
+# Gehaeuse ragt und mit dem Schnellwechsler kollidiert, muss das Gehaeuse
+# mindestens so hoch sein wie der Ausleger dick ist, plus Wand.
+H_KOERPER = 72.0
 Z_UNTEN = Z_KOERPER + H_KOERPER            # 95
 T_FLANSCH = 10.0
 Z_ZANGE_KOPF = Z_UNTEN + T_FLANSCH         # 105
@@ -97,59 +102,76 @@ RACK_VON, RACK_BIS = -30.0, 50.0
 ZAHN_VON, ZAHN_BIS = -22.0, 22.0            # Verzahnungsbereich um das Ritzel
 
 # ---------------------------------------------------------------- Antrieb
-MOT_FLANSCH = 42.0                          # NEMA 17
-MOT_L_MOTOR = 40.0
-MOT_L_GETRIEBE = 40.0
-MOT_L_BREMSE = 28.0
-MOT_L = MOT_L_MOTOR + MOT_L_GETRIEBE + MOT_L_BREMSE          # 108 mm
+MOT_FLANSCH = P.MOT_FLANSCH
+MOT_L_GETRIEBE = P.MOT_L_GETRIEBE
+MOT_L_MOTOR = P.MOT_L_MOTOR
+MOT_L_BREMSE = P.MOT_L_BREMSE
+MOT_L = P.MOT_L_GESAMT
 Y_MOT = GEH_Y / 2                                            # Anbauflaeche
+
+# ---------------------------------------------------------------- Gestaltung
+# Der Antrieb wird nicht angeschraubt, sondern in einen angeformten Ausleger
+# eingehaust, der mit grossem Radius in den Grundkoerper uebergeht. Auf der
+# Gegenseite sitzt ein kuerzerer Ausleger fuer den Motortreiber - er macht die
+# Form absichtsvoll und holt den Schwerpunkt naeher an die Flanschachse.
+# Auslegerdurchmesser HERGELEITET: der NEMA-Flansch ist quadratisch, seine
+# Ecken liegen auf dem Umkreis MOT_FLANSCH*sqrt(2). Der Ausleger muss diesen
+# Umkreis aufnehmen, plus Wandstaerke fuer das Fraesen in Aluminium.
+WAND_AUSL = 4.0                             # mm
+AUSL_QUER = MOT_FLANSCH * 2 ** 0.5 + 2 * WAND_AUSL
+Y_AUSL_MOT = Y_MOT - 10.0 + MOT_L + 6.0     # Aussenkante Motorausleger
+Y_AUSL_EL = 46.0                            # Laenge Elektronikausleger
+R_AUSSEN = 10.0                             # Radius der senkrechten Aussenkanten
+R_UEBER = 8.0                               # Radius am Uebergang zum Ausleger
 
 
 # ================================================================ Bauteile
 def gehaeuse():
-    """Pos.4 - Greifergehaeuse, EN AW-6082 T6."""
-    p = Pos(0, 0, Z_KOERPER) * Box(GEH_X, GEH_Y, H_KOERPER, align=C)
+    """Pos.4 - Greifergehaeuse, EN AW-6082 T6.
 
-    # Fuehrungstasche oben, in X begrenzt auf den Verfahrbereich
+    GESTALTUNG: geformter Koerper statt Quader mit Anbauteilen. Motor und
+    Getriebe sind rund, also ist auch ihre Einhausung rund - ein zylindrischer
+    Ausleger geht ohne Absatz in den Grundkoerper ueber. Gegenueber sitzt ein
+    kuerzerer Ausleger fuer den Motortreiber; er macht die Form absichtsvoll
+    und holt den Schwerpunkt naeher an die Flanschachse.
+    """
+    p = Pos(0, 0, Z_KOERPER) * Box(GEH_X, GEH_Y, H_KOERPER, align=C)
+    p = fillet(p.edges().filter_by(Axis.Z), R_AUSSEN)
+
+    # Zylindrische Ausleger, in den Grundkoerper eingebunden
+    p += Pos(0, Y_MOT - 14, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
+        AUSL_QUER / 2, Y_AUSL_MOT - Y_MOT + 14, align=CU)
+    p += Pos(0, -(Y_MOT - 14), Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
+        AUSL_QUER / 2, Y_AUSL_EL, align=CU)
+
+    # Innenraeume: Antrieb rechts, Motortreiber links
+    p -= Pos(0, Y_MOT - 12, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
+        (MOT_FLANSCH * 2 ** 0.5 + 1) / 2, Y_AUSL_MOT - Y_MOT + 14, align=CU)
+    p -= Pos(0, -(Y_MOT - 12), Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
+        (AUSL_QUER - 10) / 2, Y_AUSL_EL - 6, align=CU)
+
+    # Fuehrungstaschen, je Zahnstange getrennt und in X begrenzt
     p -= Pos((RACK_VON + X_R) / 2, 0, Z_RACK_O) * Box(
         X_R - RACK_VON + 4, SCHL_B + 0.4, SCHL_H + H_FUSS + H_KOPF, align=C)
-    # Fuehrungstasche unten, spiegelbildlich
     p -= Pos((X_L - RACK_VON) / 2, 0, Z_TEIL_U - H_KOPF) * Box(
         X_R - RACK_VON + 4, SCHL_B + 0.4, SCHL_H + H_FUSS + H_KOPF, align=C)
 
-    # Freiraum fuer die Stege, die von den Zahnstangen nach unten zu den
-    # Backenflanschen laufen. Ohne diese Aussparung durchdringen die Stege
-    # den Gehaeuseboden.
+    # Freiraum fuer die Stege zu den Backenflanschen
     for seite in (1, -1):
         x_m = seite * X_ZANGE
         p -= Pos(x_m, 0, Z_RACK_O + SCHL_H) * Box(
             26 + 2 * HUB + 2, SCHL_B + 0.4, Z_UNTEN - Z_RACK_O - SCHL_H, align=C)
 
-    # Freiraum fuer das Ritzel: Zylinder mit Achse in Y
+    # Ritzelfreiraum und durchgehende Lagerbohrung, Achse in Y
     p -= Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
         R_TEIL + H_KOPF + 1.0, B_ZAHN + 2, align=CC)
-    # Lagerbohrung der Ritzelwelle durch beide Gehaeusewaende
     p -= Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        D_WELLE / 2 + 0.1, GEH_Y + 10, align=CC)
-
-    # Motoranbau: Zentrierung und Schraubbild NEMA 17 (31 mm Lochabstand)
-    p -= Pos(0, Y_MOT - 6, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        22.0 / 2, 12, align=CC)
-    for dx in (-15.5, 15.5):
-        for dz in (-15.5, 15.5):
-            p -= Pos(dx, Y_MOT - 5, Z_ACHSE + dz) * Rot(90, 0, 0) * Cylinder(
-                2.5, 14, align=CC)
+        D_WELLE / 2 + 0.1, 2 * Y_AUSL_MOT, align=CC)
 
     # Anschraubbild zum Schnellwechsler (4x M6 auf Lochkreis 50)
     for i in range(4):
         a = radians(45 + 90 * i)
         p -= Pos(25.0 * cos(a), 25.0 * sin(a), Z_KOERPER) * Cylinder(2.5, 12, align=C)
-
-    # Materialaussparungen. Mindestens WAND Restwand stehen lassen - eine
-    # zu duenne Wand erzeugt degenerierte Geometrie, die beim STEP-Export
-    # zerfaellt (siehe Rueckleseprüfung in greifer.py).
-    for sx in (-1, 1):
-        p -= Pos(sx * 52, 0, Z_KOERPER + 6) * Box(12, 26, H_KOERPER - 12, align=C)
     return p
 
 
@@ -175,7 +197,7 @@ def ritzelwelle():
     # Endet buendig an der Anbauflaeche des Motors - der Getriebeabtrieb
     # kuppelt dort an, beide duerfen sich nicht durchdringen.
     return Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        D_WELLE / 2, GEH_Y, align=CC)
+        D_WELLE / 2, GEH_Y - 4, align=CC)
 
 
 def _zahnstange(oben, offen):
@@ -243,7 +265,7 @@ def motor():
     Zahnstangengetriebe ist nicht selbsthemmend, bei Stromausfall wuerde das
     Bauteil sonst fallen.
     """
-    y0 = Y_MOT
+    y0 = GEH_Y / 2 - 2.0
     p = Pos(0, y0 + MOT_L_GETRIEBE / 2, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
         36.0 / 2, MOT_L_GETRIEBE, align=CC)                       # Getriebe
     p += Pos(0, y0 + MOT_L_GETRIEBE + MOT_L_MOTOR / 2, Z_ACHSE) * \
