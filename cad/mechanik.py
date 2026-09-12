@@ -53,11 +53,10 @@ CU = (Align.CENTER, Align.CENTER, Align.MIN)
 
 # ---------------------------------------------------------------- Ebenen in Z
 Z_KOERPER = 40.0
-# Gehaeusehoehe HERGELEITET: der zylindrische Ausleger hat den Durchmesser
-# AUSL_QUER und ist mittig auf der Ritzelachse. Damit er nicht oben aus dem
-# Gehaeuse ragt und mit dem Schnellwechsler kollidiert, muss das Gehaeuse
-# mindestens so hoch sein wie der Ausleger dick ist, plus Wand.
-H_KOERPER = 72.0
+# Gehaeusehoehe HERGELEITET aus der Verkleidung: der Funktionstraeger muss in
+# die Squircle-Schale passen, also hoechstens 2*(SQ_C - Wand - Spiel) hoch
+# sein. Nach unten begrenzt ihn die Mechanik: 2 Zahnstangen + Ritzel + Waende.
+H_KOERPER = 62.0
 Z_UNTEN = Z_KOERPER + H_KOERPER            # 95
 T_FLANSCH = 10.0
 Z_ZANGE_KOPF = Z_UNTEN + T_FLANSCH         # 105
@@ -109,6 +108,37 @@ MOT_L_BREMSE = P.MOT_L_BREMSE
 MOT_L = P.MOT_L_GESAMT
 Y_MOT = GEH_Y / 2                                            # Anbauflaeche
 
+# ---------------------------------------------------------------- Squircle
+# Die Aussenform ist eine Superellipse (Squircle):
+#     |y/a|^n + |z/c|^n = 1
+# n = 2 ergibt eine Ellipse, n -> unendlich ein Rechteck. Bei n = 4 entsteht
+# die volle, weiche Form, die an Geraeten ueblich ist: fast rechteckige
+# Flaechen mit stetig gekruemmten Ecken - anders als eine Verrundung, die
+# zwischen Gerade und Kreisbogen einen Kruemmungssprung hat.
+SQ_N = 4.0                                  # Exponent der Superellipse
+SQ_PUNKTE = 240                             # Stuetzstellen des Profils
+
+# Halbachsen HERGELEITET, nicht gewaehlt:
+#   a  Baulaenge des Antriebs + Wand; der Antrieb muss vollstaendig hinein,
+#      sonst steht wieder etwas heraus
+#   c  Bauhoehe der Mechanik (2 Zahnstangen + Ritzel) bzw. Umkreis des
+#      Motorflansches - der groessere Wert bestimmt
+WAND_SQ = 6.0                               # mm Wandstaerke Alu, gefraest
+WAND_VERK = 3.0                             # mm Wandstaerke Verkleidung, SLS-Druck
+
+
+def squircle(a, c, n=SQ_N, punkte=SQ_PUNKTE):
+    """Punkte einer Superellipse mit den Halbachsen a und c."""
+    from math import cos, sin, pi, copysign
+    aus = []
+    for i in range(punkte):
+        t = 2 * pi * i / punkte
+        ct, st = cos(t), sin(t)
+        aus.append((copysign(abs(ct) ** (2.0 / n), ct) * a,
+                    copysign(abs(st) ** (2.0 / n), st) * c))
+    return aus
+
+
 # ---------------------------------------------------------------- Gestaltung
 # Der Antrieb wird nicht angeschraubt, sondern in einen angeformten Ausleger
 # eingehaust, der mit grossem Radius in den Grundkoerper uebergeht. Auf der
@@ -119,6 +149,15 @@ Y_MOT = GEH_Y / 2                                            # Anbauflaeche
 # Umkreis aufnehmen, plus Wandstaerke fuer das Fraesen in Aluminium.
 WAND_AUSL = 4.0                             # mm
 AUSL_QUER = MOT_FLANSCH * 2 ** 0.5 + 2 * WAND_AUSL
+
+# Squircle-Halbachsen aus Antrieb und Mechanik
+# Der Antrieb kann erst NACH der Mechanik beginnen: die Zahnstangen belegen
+# +-SCHL_B/2 um die Mittelebene. Diese Breite gehoert in die Halbachse.
+SQ_A = SCHL_B / 2 + 3.0 + MOT_L + WAND_SQ                   # Y-Halbachse
+SQ_C = max(SCHL_H + R_TEIL + WAND_SQ,
+           MOT_FLANSCH * 2 ** 0.5 / 2 + WAND_SQ)            # Z-Halbachse
+Y_MOT_INNEN = SCHL_B / 2 + 3.0                              # Motorsitz
+Y_TRAEGER = SCHL_B / 2 + 8.0                                # zentraler Traeger
 Y_AUSL_MOT = Y_MOT - 10.0 + MOT_L + 6.0     # Aussenkante Motorausleger
 Y_AUSL_EL = 46.0                            # Laenge Elektronikausleger
 R_AUSSEN = 10.0                             # Radius der senkrechten Aussenkanten
@@ -127,28 +166,25 @@ R_UEBER = 8.0                               # Radius am Uebergang zum Ausleger
 
 # ================================================================ Bauteile
 def gehaeuse():
-    """Pos.4 - Greifergehaeuse, EN AW-6082 T6.
+    """Pos.4 - Funktionstraeger, EN AW-6082 T6, gefraest.
 
-    GESTALTUNG: geformter Koerper statt Quader mit Anbauteilen. Motor und
-    Getriebe sind rund, also ist auch ihre Einhausung rund - ein zylindrischer
-    Ausleger geht ohne Absatz in den Grundkoerper ueber. Gegenueber sitzt ein
-    kuerzerer Ausleger fuer den Motortreiber; er macht die Form absichtsvoll
-    und holt den Schwerpunkt naeher an die Flanschachse.
+    WERKSTOFFGERECHTE TRENNUNG: nur was Kraft uebertraegt, ist aus Aluminium -
+    Zahnstangenfuehrung, Ritzellagerung, Motorflansch, Verschraubung zum
+    Schnellwechsler. Die Aussenform uebernimmt die Verkleidung (Pos.12) aus
+    dem 3D-Druck; sie traegt keine Last und darf deshalb duennwandig sein.
+
+    Ein massiver Squircle aus Aluminium waege 2,56 kg - der Greifer laege
+    damit bei 83 %% der Robotertraglast. Getrennt sind es rund 0,8 kg.
     """
-    p = Pos(0, 0, Z_KOERPER) * Box(GEH_X, GEH_Y, H_KOERPER, align=C)
-    p = fillet(p.edges().filter_by(Axis.Z), R_AUSSEN)
+    p = Pos(0, 0, Z_KOERPER) * Box(GEH_X - 2 * WAND_SQ, 2 * Y_TRAEGER,
+                                   H_KOERPER, align=C)
+    p = fillet(p.edges().filter_by(Axis.Z), 6.0)
 
-    # Zylindrische Ausleger, in den Grundkoerper eingebunden
-    p += Pos(0, Y_MOT - 14, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
-        AUSL_QUER / 2, Y_AUSL_MOT - Y_MOT + 14, align=CU)
-    p += Pos(0, -(Y_MOT - 14), Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        AUSL_QUER / 2, Y_AUSL_EL, align=CU)
-
-    # Innenraeume: Antrieb rechts, Motortreiber links
-    p -= Pos(0, Y_MOT - 12, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
-        (MOT_FLANSCH * 2 ** 0.5 + 1) / 2, Y_AUSL_MOT - Y_MOT + 14, align=CU)
-    p -= Pos(0, -(Y_MOT - 12), Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        (AUSL_QUER - 10) / 2, Y_AUSL_EL - 6, align=CU)
+    # Motorflansch: Aufnahme fuer Getriebe und Zentrierung
+    p += Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
+        MOT_FLANSCH / 2 + 5, 14, align=CU)
+    p -= Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
+        MOT_FLANSCH / 2 - 3, 20, align=CU)
 
     # Fuehrungstaschen, je Zahnstange getrennt und in X begrenzt
     p -= Pos((RACK_VON + X_R) / 2, 0, Z_RACK_O) * Box(
@@ -160,18 +196,51 @@ def gehaeuse():
     for seite in (1, -1):
         x_m = seite * X_ZANGE
         p -= Pos(x_m, 0, Z_RACK_O + SCHL_H) * Box(
-            26 + 2 * HUB + 2, SCHL_B + 0.4, Z_UNTEN - Z_RACK_O - SCHL_H, align=C)
+            26 + 2 * HUB + 2, SCHL_B + 0.4, Z_UNTEN - Z_RACK_O + 20, align=C)
 
-    # Ritzelfreiraum und durchgehende Lagerbohrung, Achse in Y
+    # Ritzelfreiraum und Lagerbohrung
     p -= Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
         R_TEIL + H_KOPF + 1.0, B_ZAHN + 2, align=CC)
     p -= Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        D_WELLE / 2 + 0.1, 2 * Y_AUSL_MOT, align=CC)
+        D_WELLE / 2 + 0.1, 4 * Y_TRAEGER, align=CC)
 
-    # Anschraubbild zum Schnellwechsler (4x M6 auf Lochkreis 50)
+    # Anschraubbild zum Schnellwechsler
     for i in range(4):
         a = radians(45 + 90 * i)
-        p -= Pos(25.0 * cos(a), 25.0 * sin(a), Z_KOERPER) * Cylinder(2.5, 12, align=C)
+        p -= Pos(25.0 * cos(a), 25.0 * sin(a), Z_KOERPER - 5) * Cylinder(2.5, 20, align=C)
+    return p
+
+
+def verkleidung():
+    """Pos.12 - Verkleidung, PA12 (SLS-Druck).
+
+    Squircle-Profil (Superellipse, n = 4) als duennwandige Schale. Sie traegt
+    keine Last, deshalb genuegen WAND_VERK Wandstaerke - im 3D-Druck ohne
+    Mehraufwand herstellbar, waehrend dieselbe Form gefraest aus dem Vollen
+    teuer und schwer waere.
+
+    Oeffnungen: oben fuer den Schnellwechsler, unten fuer die Greiferzangen.
+    """
+    from build123d import Polyline, make_face, extrude, Plane
+
+    def schale(a, c, laenge):
+        k = Polyline(*[(y, z) for y, z in squircle(a, c)], close=True)
+        return extrude(Plane.YZ * make_face(k), amount=laenge / 2, both=True)
+
+    p = Pos(0, 0, Z_ACHSE) * schale(SQ_A, SQ_C, GEH_X)
+    p -= Pos(0, 0, Z_ACHSE) * schale(SQ_A - WAND_VERK, SQ_C - WAND_VERK,
+                                     GEH_X - 2 * WAND_VERK)
+
+    # Freiraum fuer den Antrieb - er reicht bis nahe an die Schale
+    p -= Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
+        MOT_FLANSCH / 2 + 6, MOT_L + 4, align=CU)
+
+    # Durchbruch oben fuer den Schnellwechsler
+    p -= Pos(0, 0, Z_KOERPER - 10) * Cylinder(31, 30, align=C)
+    # Durchbrueche unten fuer die Zangen
+    for seite in (1, -1):
+        p -= Pos(seite * X_ZANGE, 0, Z_UNTEN - 40) * Box(
+            40 + 2 * HUB, SCHL_B + 26, 80, align=C)
     return p
 
 
@@ -197,7 +266,7 @@ def ritzelwelle():
     # Endet buendig an der Anbauflaeche des Motors - der Getriebeabtrieb
     # kuppelt dort an, beide duerfen sich nicht durchdringen.
     return Pos(0, 0, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
-        D_WELLE / 2, GEH_Y - 4, align=CC)
+        D_WELLE / 2, 2 * (Y_MOT_INNEN + 1), align=CC)
 
 
 def _zahnstange(oben, offen):
@@ -265,7 +334,7 @@ def motor():
     Zahnstangengetriebe ist nicht selbsthemmend, bei Stromausfall wuerde das
     Bauteil sonst fallen.
     """
-    y0 = GEH_Y / 2 - 2.0
+    y0 = Y_MOT_INNEN + 1.0
     p = Pos(0, y0 + MOT_L_GETRIEBE / 2, Z_ACHSE) * Rot(90, 0, 0) * Cylinder(
         36.0 / 2, MOT_L_GETRIEBE, align=CC)                       # Getriebe
     p += Pos(0, y0 + MOT_L_GETRIEBE + MOT_L_MOTOR / 2, Z_ACHSE) * \

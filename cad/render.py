@@ -34,6 +34,7 @@ FARBE = {
     "8":  "0.25 0.65 0.45 1",    # Servomotor, gruen
     "9":  "0.72 0.75 0.80 1",    # Greiferzange
     "10": "0.15 0.15 0.17 1",    # Weichbacke NBR
+    "11": "0.11 0.11 0.12 1",    # Verkleidung, schwarzes PA12 (SLS)
 }
 
 
@@ -118,11 +119,12 @@ def main():
     export_stl(Pos(*[-c for c in P.B_COG]) * b, os.path.join(MESH, "bauteilB.stl"))
 
     print("Rendern ...")
-    render(teile, False, "greifer_iso.png", (0.46, 135, -20))
-    render(teile, False, "greifer_front.png", (0.42, 90, 0))
+    render(teile, False, "greifer_iso.png", (0.50, 140, -22))
+    render(teile, False, "greifer_front.png", (0.44, 90, 0))
+    render(teile, False, "greifer_seite.png", (0.46, 0, -8))
     render(teile, True, "greifer_mit_bauteilB.png", (0.58, 135, -18))
     # Mechanik ohne Gehaeuse - sonst sieht man von der Konstruktion nichts
-    innen = [(p, k) for p, k in teile if p not in ("1", "2", "3", "4")]
+    innen = [(p, k) for p, k in teile if p not in ("1", "2", "3", "4", "11")]
     render(innen, False, "greifer_mechanik.png", (0.34, 150, -32))
     render(innen, False, "greifer_mechanik_oben.png", (0.30, 90, -78))
 
