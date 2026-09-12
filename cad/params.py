@@ -154,7 +154,6 @@ ZANGE_RP02 = 460.0                  # MPa  Streckgrenze
 ZANGE_S_ZUL = 2.0                   # -    Sicherheit gegen Fliessen
 ZANGE_SIGMA_ZUL = ZANGE_RP02 / ZANGE_S_ZUL   # MPa
 
-ZANGE_L = 120.0                     # mm  freie Kraglaenge (Einspannung -> Kraftangriff)
 ZANGE_B = 25.0                      # mm  Breite (quer zur Lastrichtung)
 ZANGE_H = 8.0                       # mm  Dicke (in Lastrichtung, = Biegerichtung)
 ZANGE_FILLET = 3.0                  # mm  Ausrundung an der Einspannung
@@ -163,6 +162,23 @@ ZANGE_FILLET = 3.0                  # mm  Ausrundung an der Einspannung
 BACKE_LAENGE = 60.0                 # mm  Laenge der Backentasche (z-Richtung)
 BACKE_BREITE = ZANGE_B - 10.0       # mm  Breite der Backentasche (y-Richtung)
 BACKE_TIEFE = 1.5                   # mm  Taschentiefe
+
+# ZANGENLAENGE GEOMETRISCH HERGELEITET, nicht gesetzt.
+# Die Greifflaeche von Bauteil B laeuft ueber die volle Bauteilhoehe
+# (B_BBOX[2] = 80 mm, aus analyze_B.py: Flaechen bei x = +-35 mm reichen von
+# z = -40 bis +40). Die Weichbacke wird mittig darauf gesetzt, also bleibt
+# oben und unten je (80 - 60)/2 = 10 mm Rand. Darueber braucht der
+# Zangenkopf Luft zur Bauteiloberseite:
+#
+#     L = Luft + Randmass oben + Backenlaenge
+#
+# Mit 120 mm war die Zange 40 mm laenger als noetig. Das kostete nicht nur
+# Bauhoehe: die Durchbiegung waechst mit dem Quadrat des Kraftarms, die
+# Biegespannung linear damit.
+LUFT_BAUTEIL = 10.0                 # mm Abstand Zangenkopf -> Bauteiloberseite
+ZANGE_L = LUFT_BAUTEIL + (B_BBOX[2] - BACKE_LAENGE) / 2.0 + BACKE_LAENGE
+# Kraftangriff = Mitte der Weichbacke, gemessen ab der Einspannung
+ZANGE_A_LAST = ZANGE_L - BACKE_LAENGE / 2.0
 
 if __name__ == "__main__":
     print("GRUPPE %d - BAUTEIL %s (PA 6)" % (GRUPPE, BAUTEIL))

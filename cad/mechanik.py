@@ -52,16 +52,11 @@ CC = (Align.CENTER, Align.CENTER, Align.CENTER)
 CU = (Align.CENTER, Align.CENTER, Align.MIN)
 
 # ---------------------------------------------------------------- Ebenen in Z
-Z_KOERPER = 40.0
-# Gehaeusehoehe HERGELEITET aus der Verkleidung: der Funktionstraeger muss in
-# die Squircle-Schale passen, also hoechstens 2*(SQ_C - Wand - Spiel) hoch
-# sein. Nach unten begrenzt ihn die Mechanik: 2 Zahnstangen + Ritzel + Waende.
-H_KOERPER = 62.0
-Z_UNTEN = Z_KOERPER + H_KOERPER            # 95
-T_FLANSCH = 10.0
-Z_ZANGE_KOPF = Z_UNTEN + T_FLANSCH         # 105
-T_ZANGE_KOPF = 10.0
-Z_ZANGE = Z_ZANGE_KOPF + T_ZANGE_KOPF      # 115
+# Die Hoehenkette wird von INNEN nach AUSSEN aufgebaut: Verzahnung -> Zahn-
+# stange -> Funktionstraeger -> Verkleidung. Kein Glied ist gesetzt, jedes
+# folgt aus dem davor. Fruehere Fassungen hatten H_KOERPER = 62 mm fest
+# eingetragen; das war 13 mm mehr, als die Mechanik braucht.
+Z_KOERPER = 40.0                           # Unterkante Schnellwechsler
 
 # ---------------------------------------------------------------- Verzahnung
 MODUL = P.MODUL
@@ -80,13 +75,49 @@ WAND = 2.5
 
 X_ZANGE = P.GREIF_ABSTAND / 2.0 + 8.0 + P.ZANGE_H / 2.0    # 47 mm
 
-# Ritzelachse waagerecht in Y, mittig im Gehaeuse
-Z_ACHSE = Z_KOERPER + H_KOERPER / 2.0                       # 67,5
-
 # Zahnstangen: Querschnitt SCHL_H (in Z) x SCHL_B (in Y)
-SCHL_H = 14.0
-SCHL_B = 16.0
+SCHL_B = 16.0                               # = B_ZAHN + 2 x 4 mm Fuehrungsrand
+# Hoehe des Zahnstangenkoerpers HERGELEITET aus zwei Bedingungen:
+#
+#  (a) Festigkeit. Die Backenkraft greift rund L_HEBEL unterhalb der
+#      Zahnstange an. Das Kippmoment laeuft durch den Zahnstangenquerschnitt
+#      am Steganschluss:  sigma = M / (SCHL_B * SCHL_H^2 / 6) <= Rp0,2 / S
+#  (b) Gestaltung. Unter dem Zahnfuss muss mindestens noch einmal die volle
+#      Zahnhoehe an Werkstoff stehen, sonst ist der Zahn nicht angebunden:
+#      SCHL_H >= 2 * H_ZAHN
+#
+# Massgebend ist (b) - die Zahnstange ist also nicht kraft-, sondern
+# gestaltbestimmt. Der aufgerundete Wert steht in SCHL_H.
+RACK_RP02 = 260.0                           # MPa, EN AW-6082 T6
+RACK_S = 2.0                                # - Sicherheit gegen Fliessen
+L_HEBEL = 150.0                             # mm Zahnstangenmitte -> Backenmitte
+_h_fest = (6 * P.F_ZANGE_AUSLEGUNG * L_HEBEL / SCHL_B / (RACK_RP02 / RACK_S)) ** 0.5
+_h_gest = 2 * H_ZAHN
+from math import ceil as _ceil
+SCHL_H = float(_ceil(max(_h_fest, _h_gest)))   # auf volle mm aufgerundet
 HUB = P.GREIFER_HUB
+
+# Bauhoehe der Mechanik ab der Ritzelachse: bis zum Teilkreis, von dort um die
+# Zahnfusshoehe in den Zahnstangenkoerper, dann dessen Hoehe.
+H_MECH = R_TEIL + H_FUSS + SCHL_H
+WAND_TRAEGER = 3.0                          # mm Decke/Boden des Funktionstraegers
+H_MECH_GES = 2 * (H_MECH + WAND_TRAEGER)
+# Zweite Bedingung: der Motor sitzt mit seinem Flansch am Traeger. Der
+# NEMA-17-Flansch ist 42 mm hoch - mehr als die Mechanik braucht. Die Bauhoehe
+# wird also NICHT von der Verzahnung bestimmt, sondern vom Motor. Kleiner ginge
+# nur mit NEMA 14 (35 mm), der aber nur die 1,4-fache statt der geforderten
+# 2,0-fachen Momentreserve haelt (siehe params.py).
+H_MOTOR_GES = P.MOT_FLANSCH + 2 * WAND_TRAEGER
+H_KOERPER = max(H_MECH_GES, H_MOTOR_GES)
+Z_UNTEN = Z_KOERPER + H_KOERPER
+T_FLANSCH = 10.0                            # M6 in Alu: 1,5 d Einschraubtiefe
+Z_ZANGE_KOPF = Z_UNTEN + T_FLANSCH
+T_ZANGE_KOPF = 10.0
+Z_ZANGE = Z_ZANGE_KOPF + T_ZANGE_KOPF
+
+# Ritzelachse waagerecht in Y, mittig im Gehaeuse
+Z_ACHSE = Z_KOERPER + H_KOERPER / 2.0
+
 
 # Teillinien liegen um den Teilkreisradius ueber bzw. unter der Achse.
 # Der Koerper sitzt um die Fusshoehe weiter weg, die Zaehne ragen von dort
@@ -154,8 +185,13 @@ AUSL_QUER = MOT_FLANSCH * 2 ** 0.5 + 2 * WAND_AUSL
 # Der Antrieb kann erst NACH der Mechanik beginnen: die Zahnstangen belegen
 # +-SCHL_B/2 um die Mittelebene. Diese Breite gehoert in die Halbachse.
 SQ_A = SCHL_B / 2 + 3.0 + MOT_L + WAND_SQ                   # Y-Halbachse
-SQ_C = max(SCHL_H + R_TEIL + WAND_SQ,
-           MOT_FLANSCH * 2 ** 0.5 / 2 + WAND_SQ)            # Z-Halbachse
+# Z-Halbachse: die Schale muss den Funktionstraeger mit Spiel umschliessen.
+# Der NEMA-Flansch ist quadratisch und steht ACHSPARALLEL im Gehaeuse - nicht
+# auf der Ecke. Massgebend ist deshalb MOT_FLANSCH/2, nicht die Diagonale.
+# Die frueher angesetzte Diagonale hat die Verkleidung um 17 mm zu hoch
+# gemacht; das war der groesste Einzelfehler in der Hoehenkette.
+SPIEL_VERK = 1.0                            # mm Luft Traeger -> Schale
+SQ_C = max(H_KOERPER / 2.0, MOT_FLANSCH / 2.0) + SPIEL_VERK + WAND_VERK
 Y_MOT_INNEN = SCHL_B / 2 + 3.0                              # Motorsitz
 Y_TRAEGER = SCHL_B / 2 + 8.0                                # zentraler Traeger
 Y_AUSL_MOT = Y_MOT - 10.0 + MOT_L + 6.0     # Aussenkante Motorausleger
@@ -182,7 +218,7 @@ def gehaeuse():
 
     # Motorflansch: Aufnahme fuer Getriebe und Zentrierung
     p += Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
-        MOT_FLANSCH / 2 + 5, 14, align=CU)
+        H_KOERPER / 2, 14, align=CU)
     p -= Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
         MOT_FLANSCH / 2 - 3, 20, align=CU)
 
@@ -231,16 +267,32 @@ def verkleidung():
     p -= Pos(0, 0, Z_ACHSE) * schale(SQ_A - WAND_VERK, SQ_C - WAND_VERK,
                                      GEH_X - 2 * WAND_VERK)
 
-    # Freiraum fuer den Antrieb - er reicht bis nahe an die Schale
+    # Innentasche fuer den Antrieb. Sie endet 0,5 mm vor der Innenflaeche der
+    # Schale - der Motor darf sich nicht abzeichnen, die Wand bleibt geschlossen.
+    l_tasche = (SQ_A - WAND_VERK - 0.5) - Y_MOT_INNEN
     p -= Pos(0, Y_MOT_INNEN, Z_ACHSE) * Rot(-90, 0, 0) * Cylinder(
-        MOT_FLANSCH / 2 + 6, MOT_L + 4, align=CU)
+        MOT_FLANSCH / 2 + 6, l_tasche, align=CU)
 
-    # Durchbruch oben fuer den Schnellwechsler
-    p -= Pos(0, 0, Z_KOERPER - 10) * Cylinder(31, 30, align=C)
-    # Durchbrueche unten fuer die Zangen
+    # Durchbruch oben fuer den Schnellwechsler: nur durch die Deckflaeche,
+    # Ø58 Zukaufteil plus 2 mm Fuge.
+    z_deckel = Z_ACHSE - SQ_C
+    p -= Pos(0, 0, z_deckel - 5) * Cylinder(
+        58 / 2 + 2, (Z_KOERPER + 1) - (z_deckel - 5), align=C)
+
+    # Durchbrueche unten fuer die Zangen. Sie muessen genau den Steg der
+    # Zahnstange freistellen - vom Beginn des Stegs bis unter die Schale -
+    # und den Backenhub nach beiden Seiten zulassen.
+    z_oben = Z_RACK_O + SCHL_H                  # dort beginnt der obere Steg
+    z_unten = Z_ACHSE + SQ_C + 1
+    # In x nur so breit wie der Steg auf seinem Weg: von der geschlossenen
+    # Stellung (x = X_ZANGE) bis zur offenen (x = X_ZANGE + HUB), je 13 mm
+    # halbe Stegbreite plus 2 mm Fuge. Frueher war der Schlitz mittig auf
+    # X_ZANGE und reichte damit bis an den Motor - man sah ihn durch die Fuge.
+    x_von = X_ZANGE - 13.0 - 2.0
+    x_bis = X_ZANGE + HUB + 13.0 + 2.0
     for seite in (1, -1):
-        p -= Pos(seite * X_ZANGE, 0, Z_UNTEN - 40) * Box(
-            40 + 2 * HUB, SCHL_B + 26, 80, align=C)
+        p -= Pos(seite * (x_von + x_bis) / 2, 0, (z_oben + z_unten) / 2) * Box(
+            x_bis - x_von, SCHL_B + 10 + 4, z_unten - z_oben, align=CC)
     return p
 
 

@@ -69,7 +69,15 @@ masse("Zahnbreite", P.B_ZAHN, "mm",
       "16MnCr5 einsatzgehaertet zul. ca. 500 N/mm2" % (sigma_F, F_t))
 
 # ================================================================ Zange
-M_b = P.F_ZANGE_AUSLEGUNG * 90
+masse("Zangenlaenge", P.ZANGE_L, "mm",
+      "Luft %.0f + Randmass (%.0f Bauteilhoehe - %.0f Backe)/2 + Backe %.0f; "
+      "Greifflaeche laeuft ueber die volle Bauteilhoehe (analyze_B.py)"
+      % (P.LUFT_BAUTEIL, P.B_BBOX[2], P.BACKE_LAENGE, P.BACKE_LAENGE))
+A_LAST = P.ZANGE_A_LAST
+masse("Kraftarm an der Zange", A_LAST, "mm",
+      "Mitte der Weichbacke ab Einspannung: %.0f - %.0f/2"
+      % (P.ZANGE_L, P.BACKE_LAENGE))
+M_b = P.F_ZANGE_AUSLEGUNG * A_LAST
 W_b = P.ZANGE_B * P.ZANGE_H ** 2 / 6
 masse("Zangenquerschnitt b x h", P.ZANGE_B, "mm (Breite)",
       "sigma = M/W = %.0f/%.0f = %.1f N/mm2, mit a_k = 1.62 -> %.1f N/mm2; "
@@ -85,36 +93,42 @@ import mechanik as M
 masse("Gehaeuselaenge", M.GEH_X, "mm",
       "Backen bei x = +-%.0f mm plus Hub %.0f und Wand -> 2*(%.0f+%.0f+%.0f)"
       % (M.X_ZANGE, P.GREIFER_HUB, M.X_ZANGE, P.GREIFER_HUB, 5))
+masse("Zahnstangenhoehe", M.SCHL_H, "mm",
+      "Festigkeit fordert %.1f mm (M = %.0f N x %.0f mm, S = %.1f gegen "
+      "Rp0,2 = %.0f), Gestaltung 2 x Zahnhoehe = %.1f mm -> aufgerundet"
+      % (M._h_fest, P.F_ZANGE_AUSLEGUNG, M.L_HEBEL, M.RACK_S, M.RACK_RP02,
+         M._h_gest))
 masse("Gehaeusehoehe", M.H_KOERPER, "mm",
-      "2 Zahnstangen a %.0f mm + Ritzel Ø%.0f + Waende: %.0f mm noetig"
-      % (M.SCHL_H, 2 * P.R_TEILKREIS, 2 * M.SCHL_H + 2 * P.R_TEILKREIS))
+      "groesser von Mechanik 2 x (%.0f + %.2f + %.0f + %.0f) = %.1f und "
+      "Motorflansch %.0f + 2 x %.0f = %.0f -> der MOTOR bestimmt die Bauhoehe"
+      % (P.R_TEILKREIS, M.H_FUSS, M.SCHL_H, M.WAND_TRAEGER, M.H_MECH_GES,
+         P.MOT_FLANSCH, M.WAND_TRAEGER, M.H_MOTOR_GES))
 
-# Auslegerdurchmesser aus dem Motorflansch
-d_umkreis = P.MOT_FLANSCH * math.sqrt(2)
-masse("Umkreis NEMA-17-Flansch", d_umkreis, "mm",
-      "quadratischer Flansch %.0f x %.0f mm -> Diagonale"
-      % (P.MOT_FLANSCH, P.MOT_FLANSCH))
-d_ausl = d_umkreis + 2 * 4.0
-masse("Auslegerdurchmesser", d_ausl, "mm",
-      "Umkreis %.1f mm plus 2 x 4 mm Wand (Fraesen, Alu)" % d_umkreis)
-
-masse("Aussenradius Gehaeuse", M.R_AUSSEN, "mm",
-      "Fertigung: Fingerfraeser Ø20 laesst R10 in einem Zug zu")
-masse("Gehaeusehoehe aus Ausleger", M.H_KOERPER, "mm",
-      "Ausleger Ø%.1f mittig auf der Ritzelachse; Gehaeuse muss ihn aufnehmen, "
-      "sonst kollidiert er mit dem Schnellwechsler" % M.AUSL_QUER)
+masse("Halbachse Verkleidung z", M.SQ_C, "mm",
+      "groesser von Traeger %.1f und Motorflansch %.0f, plus %.0f Spiel "
+      "und %.0f Wand; der NEMA-Flansch steht achsparallel, seine Diagonale "
+      "ist NICHT massgebend"
+      % (M.H_KOERPER / 2, P.MOT_FLANSCH / 2, M.SPIEL_VERK, M.WAND_VERK))
+masse("Halbachse Verkleidung y", M.SQ_A, "mm",
+      "Zahnstange %.0f/2 + %.0f Sitz + Antrieb %.0f + %.0f Wand"
+      % (M.SCHL_B, 3.0, M.MOT_L, M.WAND_SQ))
+masse("Bauhoehe Greifer gesamt", M.Z_ZANGE + P.ZANGE_L, "mm",
+      "Flansch -> Wechsler %.0f + Traeger %.1f + Flansch %.0f + Kopf %.0f "
+      "+ Zange %.0f" % (M.Z_KOERPER, M.H_KOERPER, M.T_FLANSCH,
+                        M.T_ZANGE_KOPF, P.ZANGE_L))
 
 # Zangenquerschnitt ueber die Steifigkeit, nicht ueber die Festigkeit
 import math
 I_y = P.ZANGE_B * P.ZANGE_H ** 3 / 12
-f_zange = P.F_ZANGE_AUSLEGUNG * 90 ** 2 / (6 * P.ZANGE_E * I_y) * (3 * 120 - 90)
+f_zange = (P.F_ZANGE_AUSLEGUNG * A_LAST ** 2 / (6 * P.ZANGE_E * I_y)
+           * (3 * P.ZANGE_L - A_LAST))
 E_NBR = 5.0            # MPa, NBR 70 Shore A
 f_belag = P.F_ZANGE_AUSLEGUNG / (P.BACKE_LAENGE * P.BACKE_BREITE) * 8.0 / E_NBR
 masse("Zangendurchbiegung", f_zange, "mm",
       "massgebend ist die Steifigkeit, nicht die Festigkeit (S = %.0f): "
       "die Zange darf sich nicht staerker verformen als der Weichbelag "
       "(%.3f mm), sonst ist die Greifkraft nicht definiert"
-      % (P.ZANGE_RP02 / (P.F_ZANGE_AUSLEGUNG * 90 /
+      % (P.ZANGE_RP02 / (P.F_ZANGE_AUSLEGUNG * A_LAST /
          (P.ZANGE_B * P.ZANGE_H ** 2 / 6) * 1.62), f_belag))
 
 # ================================================================ Ausgabe
