@@ -33,7 +33,8 @@ in KW 40 kostet jede Änderung die halbe Kette.
 | **Greifkonzept** | 2-Finger-Parallelgreifer, Backen | Bauteil B hat zwei ebene, parallele Seitenflächen im Abstand 70 mm. Formschluss ist nicht nötig, Reibschluss reicht. Einfachste Lösung, die die Aufgabe erfüllt. |
 | **Antrieb** | **Servomotor** mit Planetengetriebe und Haltebremse | Regelbare Greifkraft (PA 6 ist weich, Ra 1,6 darf nicht leiden), leise, keine Druckluftinfrastruktur. Preis: nicht selbsthemmend → Haltebremse ist zwingend, nicht optional. |
 | **Mechanik** | Zahnstange–Ritzel, 1:1 synchron | 12,5 mm Backenhub brauchen nur ~72° Ritzeldrehung. Eine Trapezspindel bräuchte 6 Umdrehungen und bei 0,3 s Schließzeit über 1000 1/min. |
-| **CAD** | **Onshape** (parametrisch, browserbasiert) | Beide sehen dasselbe Modell live, keine Versionskonflikte, keine lokale Installation. Ersetzt die bisherige Skript-Konstruktion als führendes Modell. |
+| **CAD + FEM** | **Onshape** (parametrisch, browserbasiert) | Beide sehen dasselbe Modell live, keine Versionskonflikte, keine lokale Installation. FEM direkt am selben Modell, ohne Exportbruch. |
+| **Berechnung / Doku** | **LaTeX** | Formeln, Einheiten und Querverweise bleiben konsistent; die Doku ist 10 Punkte wert und wächst ab M1 mit. |
 | **Simulation** | **MuJoCo** | Siehe Abschnitt 3. |
 
 ### Kennwerte aus der Vorauslegung (zu bestätigen, nicht gesetzt)
@@ -111,7 +112,7 @@ Aus der Einführungsfolie, wörtlich — der Plan ist genau darauf gebaut:
 | Warnung | Wie der Plan sie abfängt |
 |---|---|
 | 1. Konstruktion nicht ohne Berechnung beginnen | Greifkraft (V2) liegt in M1, **vor** dem CAD-Start in M2. Design Freeze trennt beides sauber. |
-| 2. FEM nicht zu spät starten | FEM (V4) liegt in M3 und ist **vor** dem Zwischenbericht fertig, nicht danach. |
+| 2. FEM nicht zu spät starten | Die FEM (E5) liegt in M3 und ist **vor** dem Zwischenbericht fertig, nicht danach. |
 | 3. Zeichnungen: Aufwand nicht unterschätzen | Zeichnung + Stückliste (E3) startet im Dezember, nicht im Januar. Zwei volle Wochen. |
 | 4. Dokumentation nicht erst in der letzten Woche | Läuft ab M1 mit. Jedes Paket wird geschrieben, **wenn** es fertig ist. Januar ist nur noch Zusammenführen. |
 | 5. Zwischenbericht ernst nehmen | Eigener Meilenstein mit Inhaltsliste, 4 Tage Puffer davor. |
@@ -225,9 +226,9 @@ davor:
 | **M0 — Kickoff** | So 20.09. | Plan abgestimmt, Rollen fix, Onshape + Repo stehen, Klärliste raus | beide |
 | **M1 — Konzept steht** | So 04.10. | Roboter gewählt (E1), Greifkonzept + Skizze (V1), Greifkraft gerechnet (V2) → **Design Freeze** | beide |
 | **M2 — CAD schließt** | So 01.11. | Zange (V3) und Grundkörper (E2) getrennt konstruiert, Baugruppe schließt kollisionsfrei, Schnittstelle eingefroren | beide |
-| **M3 — Nachweise** | So 22.11. | Analytisch fertig, FEM gerechnet, Netzkonvergenz, Vergleich (V4) | Viktoriia |
+| **M3 — Nachweise** | So 22.11. | Analytisch fertig (V4), FEM gerechnet inkl. Netzkonvergenz (E5), beide Wege verglichen | beide |
 | 🔴 **Zwischenbericht** | **Do 26.11.** | Präsentation: Konzept, Auslegung, CAD, erste Nachweise | beide |
-| **M4 — Zeichnung + Simulation + FDM** | So 20.12. | Baugruppenzeichnung + Stückliste (E3), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4), Zange gedruckt und vermessen (V5) | parallel |
+| **M4 — Zeichnung + Simulation + FDM** | So 20.12. | Baugruppenzeichnung + Stückliste (E3), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4), Zange gedruckt und vermessen (E6) | parallel |
 | *Weihnachtspause* | 21.12.–03.01. | — | — |
 | **M5 — Zusammenführen** | So 11.01. | Doku zusammengeführt, Cross-Review, ZIP gepackt | beide |
 | 🔴 **Endkontrolle** | **Fr 15.01.** | ZIP hochgeladen, Präsenztermin | beide |
@@ -268,6 +269,9 @@ Diese müssen früh geklärt werden, weil sie nach hinten teuer werden:
    Orientierung anders ist, ändert sich die Bahn und möglicherweise die
    Greifrichtung.
 3. **FDM-Drucker.** Verfügbarkeit und Werkstoff klären (Labor oder privat).
+3a. **Onshape-FEM.** Prüfen, ob der Education-Plan die Simulation freischaltet.
+   Falls nicht, springt die bestehende CalculiX-Kette ein — Ergebnis
+   gleichwertig, nur mehr Handarbeit.
 4. **Onshape-Lizenz.** Free-Plan macht Dokumente öffentlich. Für eine
    Studienarbeit ist das meist egal, sollte aber bewusst entschieden sein —
    Education-Plan ist kostenlos und privat.
@@ -305,7 +309,6 @@ Der Plan ist ein **Vorschlag**, kein Beschluss. Konkret bitte Rückmeldung zu:
 - Onshape okay, oder arbeitest du lieber in etwas anderem? (SolidWorks,
   Fusion, Inventor — dann müssen wir nur die Schnittstelle über STEP klären.)
 - Ist dir die Timeline zu eng oder zu locker?
-- Hast du beim FEM einen Tool-Wunsch? Es gibt hier eine laufende
-  CalculiX-Kette, aber wenn du lieber in einer GUI rechnest, ist das
-  vollkommen in Ordnung — dann wird die Skriptkette die unabhängige
-  Gegenrechnung, und der Bericht wird dadurch besser, nicht schlechter.
+- Die FEM ist bewusst zu Elias gewandert, damit deine Seite nicht überläuft.
+  Du rechnest analytisch, er numerisch — zwei unabhängige Wege auf dasselbe
+  Bauteil. Wenn du die FEM lieber selbst machst, tauschen wir zurück.
