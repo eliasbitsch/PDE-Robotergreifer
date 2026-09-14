@@ -7,3 +7,6 @@ moodle/
 videos/*/node_modules/
 videos/*/out/
 videos/*/.hyperframes/
+videos/*/capture-*/
+videos/*/.media/
+videos/*/snapshots*/
