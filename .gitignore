@@ -10,3 +10,4 @@ videos/*/.hyperframes/
 videos/*/capture-*/
 videos/*/.media/
 videos/*/snapshots*/
+videos/*/renders/
