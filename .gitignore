@@ -3,3 +3,7 @@ out/fem/
 onshape/endpoints.json
 *.pyc
 __pycache__/
+moodle/
+videos/*/node_modules/
+videos/*/out/
+videos/*/.hyperframes/

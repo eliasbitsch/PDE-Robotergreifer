@@ -77,6 +77,47 @@ Windows nur über WSL, und kein Mehrwert für das, was abgegeben wird.
 
 ---
 
+## 3a. Wofür es Punkte gibt
+
+100 Punkte insgesamt. Die Verteilung steht in der Einführungsfolie und sie ist
+der wichtigste Planungsinput überhaupt:
+
+| Arbeitspaket | Punkte | Wer |
+|---|---:|---|
+| **3D-Konstruktion des Greifers** | **20** | Elias + Viktoriia |
+| Allgemein (Ausführung der technischen Dokumentation) | 10 | beide |
+| Auswahl eines geeigneten Roboters inkl. Begründung | 10 | Elias |
+| Konzeptskizze des Greifers | 10 | Viktoriia |
+| Berechnung und mechanische Auslegung des Greifmechanismus | 10 | Viktoriia |
+| Analytische Berechnung der Greiferzange | 10 | Viktoriia |
+| Numerische Berechnung der Greiferzange | 10 | Viktoriia |
+| Baugruppenzeichnung inklusive Stückliste | 10 | Elias |
+| Kollisionskontrolle und visuelle Darstellung des Arbeitsablaufes | 10 | Elias |
+
+**Notenskala:** ≥88 % Sehr Gut · ≥75 % Gut · ≥63 % Befriedigend · ≥50 % Genügend · <50 % Nicht genügend
+
+Zwei Schlüsse daraus:
+
+- **Die 3D-Konstruktion ist doppelt gewichtet.** Sie bekommt die meiste Zeit
+  und wird von beiden getragen — nicht nebenbei erledigt.
+- **Die Dokumentation allein bringt 10 Punkte**, unabhängig vom Inhalt. Das
+  ist die billigste Note im ganzen Projekt und wird deshalb nicht ans Ende
+  geschoben (siehe unten).
+
+### Die fünf Warnungen der LV-Leitung
+
+Aus der Einführungsfolie, wörtlich — der Plan ist genau darauf gebaut:
+
+| Warnung | Wie der Plan sie abfängt |
+|---|---|
+| 1. Konstruktion nicht ohne Berechnung beginnen | Greifkraft (V2) liegt in M1, **vor** dem CAD-Start in M2. Design Freeze trennt beides sauber. |
+| 2. FEM nicht zu spät starten | FEM (V4) liegt in M3 und ist **vor** dem Zwischenbericht fertig, nicht danach. |
+| 3. Zeichnungen: Aufwand nicht unterschätzen | Zeichnung + Stückliste (E3) startet im Dezember, nicht im Januar. Zwei volle Wochen. |
+| 4. Dokumentation nicht erst in der letzten Woche | Läuft ab M1 mit. Jedes Paket wird geschrieben, **wenn** es fertig ist. Januar ist nur noch Zusammenführen. |
+| 5. Zwischenbericht ernst nehmen | Eigener Meilenstein mit Inhaltsliste, 4 Tage Puffer davor. |
+
+---
+
 ## 4. Aufgabenteilung
 
 Zwei Hälften, die jede für sich eine geschlossene Geschichte erzählen.
@@ -183,14 +224,22 @@ davor:
 | **M2 — CAD schließt** | So 01.11. | Zange (V3) und Grundkörper (E2) getrennt konstruiert, Baugruppe schließt kollisionsfrei, Schnittstelle eingefroren | beide |
 | **M3 — Nachweise** | So 22.11. | Analytisch fertig, FEM gerechnet, Netzkonvergenz, Vergleich (V4) | Viktoriia |
 | 🔴 **Zwischenbericht** | **Do 26.11.** | Präsentation: Konzept, Auslegung, CAD, erste Nachweise | beide |
-| **M4 — FDM + Simulation** | So 20.12. | Zange gedruckt und vermessen (V5), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4) | parallel |
+| **M4 — Zeichnung + Simulation + FDM** | So 20.12. | Baugruppenzeichnung + Stückliste (E3), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4), Zange gedruckt und vermessen (V5) | parallel |
 | *Weihnachtspause* | 21.12.–03.01. | — | — |
-| **M5 — Zeichnung + Doku** | So 11.01. | Baugruppenzeichnung + Stückliste (E3), Doku zusammengeführt, Cross-Review | beide |
+| **M5 — Zusammenführen** | So 11.01. | Doku zusammengeführt, Cross-Review, ZIP gepackt | beide |
 | 🔴 **Endkontrolle** | **Fr 15.01.** | ZIP hochgeladen, Präsenztermin | beide |
 
 **Puffer:** vor dem Zwischenbericht 4 Tage, vor der Endkontrolle 4 Tage. Das
 ist knapp. Deshalb liegt die FEM-Kette **vor** dem Zwischenbericht und nicht
 danach — wenn dort etwas schiefgeht, haben wir im Dezember noch Luft.
+
+**Die Zeichnung liegt bewusst im Dezember, nicht im Januar.** Warnung 3 der
+LV-Leitung. Zwei Wochen für Zeichnung und Stückliste sind nicht großzügig,
+sondern realistisch.
+
+**Dokumentation läuft ab M1 mit.** Jedes Paket wird geschrieben, wenn es
+fertig ist, nicht am Ende. M5 ist Zusammenführen und Korrekturlesen — kein
+Schreiben. Das ist Warnung 4, und sie ist 10 Punkte wert.
 
 **Fixer Termin:** jede Woche ein kurzer Sync, 20 Minuten, Stand + Blocker.
 
@@ -201,9 +250,13 @@ danach — wenn dort etwas schiefgeht, haben wir im Dezember noch Luft.
 Diese müssen früh geklärt werden, weil sie nach hinten teuer werden:
 
 0. **Getrennte LV-Gruppen.** Wir sind in BB-1 und BB-2, wollen aber gemeinsam
-   zum Zwischenbericht am 26.11. (BB-1-Termin) und zur Endkontrolle am 15.01.
-   Das muss mit Alexandra Saliger abgesprochen sein — sonst steht eine/r von
-   uns am 26.11. in der falschen Gruppe. **Vor allem anderen klären.**
+   nach BB-1 fahren (Zwischenbericht 26.11., Endkontrolle 15.01.).
+   Entspannend: laut Einführungsfolie muss **bei Zwischenbericht und
+   Endkontrolle mindestens eine Person pro Gruppe anwesend sein** — nicht
+   beide. Trotzdem mit Alexandra Saliger abklären, ob die Anwesenheit in der
+   jeweils anderen Kohorte angerechnet wird. Zusätzlich gilt **75 %
+   Anwesenheitspflicht**, die zählt jede/r in der eigenen Gruppe.
+   **Vor allem anderen klären.**
 1. **Gruppennummer.** `task.md` sagt Gruppe 10, Tab. 1 der Angabe kennt nur
    Gruppen 1–8 (Bauteil B = Gruppe 2). Bei der LV-Leitung nachfragen, bevor
    irgendein Dokument mit einer Nummer im Kopf gedruckt wird.
