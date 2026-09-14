@@ -3,6 +3,7 @@
 **LV:** Produktdesign und Produktentwicklung, MRE WS 2026/27
 **Gruppe:** 10 · **Bauteil:** B (PA 6, Ra 1,6)
 **Team:** Bitsch Elias · Ovdiienko Viktoriia
+**LV-Gruppen:** getrennt (BB-1 / BB-2) — Zwischenbericht und Endabgabe fahren wir **gemeinsam nach BB-1**
 **Stand:** 14.09.2026 — Vorschlag, noch nicht abgestimmt
 
 ---
@@ -142,24 +143,54 @@ Netz), nicht das Bauteil. Genau so schreiben wir es hin.
 
 ## 6. Timeline
 
-> ⚠️ **Der Abgabetermin ist angenommen, nicht bestätigt.** Ich komme von hier
-> aus nicht an Moodle. Sobald der echte Termin feststeht, verschieben sich alle
-> Meilensteine mit — die Abstände zwischen ihnen bleiben.
-> **Annahme: Abgabe Freitag, 15.01.2027.**
+### Die zwei harten Termine
 
-| Meilenstein | Zeitraum | Ergebnis | Wer |
+Wir sind in getrennten LV-Gruppen, liefern aber gemeinsam ab. Wir fahren beide
+nach **BB-1** — das sind die **früheren** Termine:
+
+| | Termin | Was |
+|---|---|---|
+| 🔴 **Zwischenbericht** | **Do 26.11.2026, 17:50, Präsenz** | BB-1 statt BB-2 (03.12.) — eine Woche früher |
+| 🔴 **Endkontrolle** | **Fr 15.01.2027, 16:10, Präsenz** | BB-1 statt BB-2 (22.01.) — eine Woche früher |
+
+**Das kostet uns je eine Woche Puffer.** Bewusste Entscheidung, aber sie muss
+mit der LV-Leitung (Saliger) abgesprochen sein — wer in BB-2 ist, präsentiert
+beim Zwischenbericht in einer fremden Gruppe. Das ist Punkt 0 auf der
+Klärliste.
+
+### LV-Termine als Taktgeber (BB-1)
+
+Die Vorlesungen geben den Rhythmus vor — wir legen die Pakete dahinter, nicht
+davor:
+
+| Datum | Thema | Was das für uns heißt |
+|---|---|---|
+| Do 17.09. | Einführung OnShape | CAD-Start **danach**, nicht davor |
+| Sa 19.09. | Modellierung und Zeichnung | Modellier-Handwerkszeug sitzt |
+| Di 22.09. | StüLi, Blech, MDB | Stücklisten-Logik für E3 |
+| Sa 24.10. | Baugruppen, Datenaustausch | fällt genau in die CAD-Phase — Timing passt |
+| Mi 04.11. | Digitale Absicherung, Simulation | direkt vor der Simulationsphase |
+| **Do 26.11.** | **Zwischenbericht** | 🔴 |
+| Mi 02.12. | CAE–CAD–CAP–CAM Prozesskette | — |
+| **Fr 15.01.** | **Endkontrolle, Fragestunde** | 🔴 |
+
+### Meilensteine
+
+| Meilenstein | Deadline | Ergebnis | Wer |
 |---|---|---|---|
-| **M0 — Kickoff** | KW 38 (14.–20.09.) | Plan abgestimmt, Rollen fix, Onshape + Repo stehen, offene Fragen an LV-Leitung raus | beide |
-| **M1 — Konzept steht** | KW 39–40 (21.09.–04.10.) | Roboter gewählt (E1), Greifkonzept + Skizze (V1), Greifkraft gerechnet (V2) → **Design Freeze** | beide |
-| **M2 — CAD schließt** | KW 41–44 (05.10.–01.11.) | Zange (V3) und Grundkörper (E2) getrennt konstruiert, Baugruppe schließt kollisionsfrei, Schnittstelle eingefroren | beide |
-| **M3 — Nachweise** | KW 45–47 (02.11.–22.11.) | Analytisch + FEM + Netzkonvergenz + Vergleich (V4) | Viktoriia |
-| **M4 — FDM-Test** | KW 48–49 (23.11.–06.12.) | Zange gedruckt, Messung, Abgleich mit FEM (V5) | Viktoriia, Druck: Elias |
-| **M5 — Output** | KW 50–51 (07.12.–20.12.) | Zeichnung + Stückliste (E3), Simulation + Ablaufvideo (E4) | Elias |
-| *Weihnachtspause* | KW 52–01 | — | — |
-| **M6 — Abgabe** | KW 02–03 (04.–15.01.) | Doku zusammengeführt, Cross-Review, ZIP hochgeladen | beide |
+| **M0 — Kickoff** | So 20.09. | Plan abgestimmt, Rollen fix, Onshape + Repo stehen, Klärliste raus | beide |
+| **M1 — Konzept steht** | So 04.10. | Roboter gewählt (E1), Greifkonzept + Skizze (V1), Greifkraft gerechnet (V2) → **Design Freeze** | beide |
+| **M2 — CAD schließt** | So 01.11. | Zange (V3) und Grundkörper (E2) getrennt konstruiert, Baugruppe schließt kollisionsfrei, Schnittstelle eingefroren | beide |
+| **M3 — Nachweise** | So 22.11. | Analytisch fertig, FEM gerechnet, Netzkonvergenz, Vergleich (V4) | Viktoriia |
+| 🔴 **Zwischenbericht** | **Do 26.11.** | Präsentation: Konzept, Auslegung, CAD, erste Nachweise | beide |
+| **M4 — FDM + Simulation** | So 20.12. | Zange gedruckt und vermessen (V5), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4) | parallel |
+| *Weihnachtspause* | 21.12.–03.01. | — | — |
+| **M5 — Zeichnung + Doku** | So 11.01. | Baugruppenzeichnung + Stückliste (E3), Doku zusammengeführt, Cross-Review | beide |
+| 🔴 **Endkontrolle** | **Fr 15.01.** | ZIP hochgeladen, Präsenztermin | beide |
 
-**Puffer:** rund drei Wochen. Bewusst so — das ist nicht die einzige LV im
-Semester, und die FEM-Kette hat erfahrungsgemäß einen schlechten Tag verdient.
+**Puffer:** vor dem Zwischenbericht 4 Tage, vor der Endkontrolle 4 Tage. Das
+ist knapp. Deshalb liegt die FEM-Kette **vor** dem Zwischenbericht und nicht
+danach — wenn dort etwas schiefgeht, haben wir im Dezember noch Luft.
 
 **Fixer Termin:** jede Woche ein kurzer Sync, 20 Minuten, Stand + Blocker.
 
@@ -169,6 +200,10 @@ Semester, und die FEM-Kette hat erfahrungsgemäß einen schlechten Tag verdient.
 
 Diese müssen früh geklärt werden, weil sie nach hinten teuer werden:
 
+0. **Getrennte LV-Gruppen.** Wir sind in BB-1 und BB-2, wollen aber gemeinsam
+   zum Zwischenbericht am 26.11. (BB-1-Termin) und zur Endkontrolle am 15.01.
+   Das muss mit Alexandra Saliger abgesprochen sein — sonst steht eine/r von
+   uns am 26.11. in der falschen Gruppe. **Vor allem anderen klären.**
 1. **Gruppennummer.** `task.md` sagt Gruppe 10, Tab. 1 der Angabe kennt nur
    Gruppen 1–8 (Bauteil B = Gruppe 2). Bei der LV-Leitung nachfragen, bevor
    irgendein Dokument mit einer Nummer im Kopf gedruckt wird.
