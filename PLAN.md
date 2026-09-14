@@ -133,8 +133,7 @@ Niemand bekommt Restarbeiten.
 | E3 | **Baugruppenzeichnung & Stückliste** | A3-Zeichnung, Positionsnummern, Stückliste mit Kauf-/Fertigungsteilen | `Elias/03_Zeichnung` |
 | E4 | **Ablaufsimulation & Kollisionskontrolle** | MuJoCo-Modell, Bahn Entnahme → Ablage, Kollisionsprotokoll, Ablaufvideo | `Elias/04_Simulation` |
 | E5 | **FEM der Greiferzange** | Netz, Randbedingungen, Netzkonvergenz, Spannung und Verformung; Abgleich gegen Viktoriias analytische Rechnung | `Elias/05_FEM` |
-| E6 | **FDM-Validierung** | Zange drucken, Durchbiegung messen, gegen die FEM halten | `Elias/06_FDM` |
-| E7 | **Infrastruktur** | Repo, Onshape-Dokument, MCP-Anbindung, Parametertabelle, Doku-Vorlage | `gemeinsam/` |
+| E6 | **Infrastruktur** | Repo, Onshape-Dokument, MCP-Anbindung, Parametertabelle, Doku-Vorlage | `gemeinsam/` |
 
 ### Viktoriia — Auslegung & Nachweis
 
@@ -144,12 +143,16 @@ Niemand bekommt Restarbeiten.
 | V2 | **Greifkraft & Antriebsauslegung** | Kraftbilanz (Gewicht + Beschleunigung + Sicherheit), Reibwert mit Quelle, Flächenpressung auf PA 6, Ritzelmoment, Motorauswahl mit Reserve, Bremsenauslegung | `Viktoriia/02_Auslegung` |
 | V3 | **Greiferzange & Weichbacken (CAD)** | Parametrische Zange in Onshape, Backentasche, Kontur passend zu Bauteil B | `Viktoriia/03_CAD_Zange` |
 | V4 | **Analytischer Festigkeitsnachweis** | Biegespannung und Durchbiegung der Zange von Hand gerechnet, Annahmen und Quellen sauber belegt — die Referenz, gegen die die FEM antritt | `Viktoriia/04_Nachweis` |
+| V5 | **FDM-Validierung** | Zange drucken, Durchbiegung unter definierter Last messen, gegen Elias' FEM halten | `Viktoriia/05_FDM` |
 
 **Warum dieser Schnitt:** Viktoriia konstruiert die Zange und rechnet sie
 analytisch durch. Elias rechnet dieselbe Zange numerisch nach. Damit prüfen
 zwei Personen unabhängig dasselbe Bauteil auf zwei Wegen — genau das verlangt
 die Angabe, und eine Abweichung fällt sofort auf, statt sich in einer Hand zu
-verstecken. Die Schnittstelle zwischen beiden ist eine
+verstecken.
+
+Der gedruckte Nachweis (V5) liegt aus demselben Grund bei Viktoriia: wer die
+FEM gerechnet hat, soll sie nicht selbst bestätigen. Die Schnittstelle zwischen beiden ist eine
 einzige Fläche: die **Anschraubebene Schlitten ↔ Zange**. Die wird in KW 41
 festgelegt und danach nicht mehr angefasst.
 
@@ -228,7 +231,7 @@ davor:
 | **M2 — CAD schließt** | So 01.11. | Zange (V3) und Grundkörper (E2) getrennt konstruiert, Baugruppe schließt kollisionsfrei, Schnittstelle eingefroren | beide |
 | **M3 — Nachweise** | So 22.11. | Analytisch fertig (V4), FEM gerechnet inkl. Netzkonvergenz (E5), beide Wege verglichen | beide |
 | 🔴 **Zwischenbericht** | **Do 26.11.** | Präsentation: Konzept, Auslegung, CAD, erste Nachweise | beide |
-| **M4 — Zeichnung + Simulation + FDM** | So 20.12. | Baugruppenzeichnung + Stückliste (E3), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4), Zange gedruckt und vermessen (E6) | parallel |
+| **M4 — Zeichnung + Simulation + FDM** | So 20.12. | Baugruppenzeichnung + Stückliste (E3), MuJoCo-Ablauf + Kollisionsprotokoll + Video (E4), Zange gedruckt und vermessen (V5) | parallel |
 | *Weihnachtspause* | 21.12.–03.01. | — | — |
 | **M5 — Zusammenführen** | So 11.01. | Doku zusammengeführt, Cross-Review, ZIP gepackt | beide |
 | 🔴 **Endkontrolle** | **Fr 15.01.** | ZIP hochgeladen, Präsenztermin | beide |

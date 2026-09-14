@@ -86,6 +86,21 @@
       .ddate { font-size: 100px; font-weight: 700; letter-spacing: -0.045em; margin-top: 18px; line-height: 1; }
       .dsub { font-size: 27px; color: var(--muted); margin-top: 18px; }
 
+      /* ---- SP points ---- */
+      .bars { margin-top: 42px; display: flex; flex-direction: column; gap: 14px; }
+      .bar { display: flex; align-items: center; gap: 26px; }
+      .bname { width: 620px; font-size: 26px; text-align: right; color: var(--fg); }
+      .btrack { flex: 1; height: 40px; background: var(--panel); border-radius: 8px; overflow: hidden; }
+      .bfill { height: 100%; width: 0%; border-radius: 8px; }
+      .bfill.hero { background: linear-gradient(90deg, #4da3ff, #b07cff); }
+      .bfill.e { background: rgba(77,163,255,0.62); }
+      .bfill.v { background: rgba(176,124,255,0.62); }
+      .bfill.both { background: rgba(61,220,132,0.5); }
+      .bval { width: 86px; font-size: 28px; font-weight: 700; color: var(--muted); }
+      .bval.hero { color: var(--fg); font-size: 36px; }
+      .pnote { margin-top: 34px; font-size: 28px; color: var(--muted); }
+      .pnote b { color: var(--fg); font-weight: 600; }
+
       /* ---- S7 split ---- */
       .split { display: flex; gap: 44px; margin-top: 48px; align-items: flex-start; }
       .col { flex: 1; border: 1px solid var(--line); border-radius: 22px; background: var(--panel); padding: 40px 42px; }
@@ -134,7 +149,7 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="80"
+    <div id="root" data-composition-id="main" data-start="0" data-duration="87"
          data-width="1920" data-height="1080">
       <div class="grain"></div>
 
@@ -204,7 +219,7 @@
       </div>
 
       <!-- S5 TOOLS -->
-      <div class="scene clip" id="s5" data-start="30" data-duration="13.5" data-track-index="0">
+      <div class="scene clip" id="s5" data-start="30" data-duration="12" data-track-index="0">
         <div class="pad" style="padding: 80px 120px">
           <div class="kicker" id="s5-k">Toolchain</div>
           <div class="tools" id="s5-tools">
@@ -242,7 +257,7 @@
       </div>
 
       <!-- S6 DEADLINES -->
-      <div class="scene clip" id="s6" data-start="43.5" data-duration="7" data-track-index="0">
+      <div class="scene clip" id="s6" data-start="42" data-duration="6.5" data-track-index="0">
         <div class="pad" style="justify-content: center">
           <div class="kicker" id="s6-k">Two hard dates</div>
           <div class="dgrid">
@@ -260,8 +275,29 @@
         </div>
       </div>
 
+      <!-- SP POINTS -->
+      <div class="scene clip" id="sp" data-start="48.5" data-duration="9" data-track-index="0">
+        <div class="pad">
+          <div class="kicker" id="sp-k">100 points — not evenly spread</div>
+          <div class="bars" id="sp-bars">
+            <div class="bar"><div class="bname" style="font-weight: 700">3D construction of the gripper</div><div class="btrack"><div class="bfill hero" data-w="100"></div></div><div class="bval hero">20</div></div>
+            <div class="bar"><div class="bname">Technical documentation</div><div class="btrack"><div class="bfill both" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Robot selection + reasoning</div><div class="btrack"><div class="bfill e" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Gripping concept sketch</div><div class="btrack"><div class="bfill v" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Mechanical design of the gripper</div><div class="btrack"><div class="bfill v" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Analytical calculation, jaws</div><div class="btrack"><div class="bfill v" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Numerical calculation, FEM</div><div class="btrack"><div class="bfill e" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Assembly drawing + BOM</div><div class="btrack"><div class="bfill e" data-w="50"></div></div><div class="bval">10</div></div>
+            <div class="bar"><div class="bname">Collision check + motion study</div><div class="btrack"><div class="bfill e" data-w="50"></div></div><div class="bval">10</div></div>
+          </div>
+          <div class="pnote" id="sp-n">
+            <b>The CAD is worth double.</b> That is why we both build it — and why the report, worth 10 on its own, starts in October, not in January.
+          </div>
+        </div>
+      </div>
+
       <!-- S7 SPLIT -->
-      <div class="scene clip" id="s7" data-start="50.5" data-duration="12.5" data-track-index="0">
+      <div class="scene clip" id="s7" data-start="57.5" data-duration="12.5" data-track-index="0">
         <div class="pad" style="justify-content: center">
           <div class="kicker" id="s7-k">Proposal — two halves that each stand alone</div>
           <div class="split">
@@ -273,6 +309,7 @@
                 <div class="item"><span class="tag">V2</span><span>Gripping force + drive sizing</span></div>
                 <div class="item"><span class="tag">V3</span><span>Jaws + soft pads (CAD)</span></div>
                 <div class="item"><span class="tag">V4</span><span>Analytical stress + deflection</span></div>
+                <div class="item"><span class="tag">V5</span><span>3D-printed check vs. FEM</span></div>
               </div>
             </div>
             <div class="col e" id="s7-ce">
@@ -283,18 +320,18 @@
                 <div class="item"><span class="tag">E2</span><span>Gripper body, drive, changer</span></div>
                 <div class="item"><span class="tag">E3</span><span>Assembly drawing + BOM</span></div>
                 <div class="item"><span class="tag">E4</span><span>Motion + collision study</span></div>
-                <div class="item"><span class="tag">E5</span><span>FEM + 3D-printed check</span></div>
+                <div class="item"><span class="tag">E5</span><span>FEM of the jaws</span></div>
               </div>
             </div>
           </div>
           <div class="seam" id="s7-s">
-            You design the jaws and prove them by hand. I prove the same jaws numerically. <b>Two independent paths, one part.</b>
+            You prove the jaws by hand and on the printer. I prove them numerically. <b>Nobody checks their own homework.</b>
           </div>
         </div>
       </div>
 
       <!-- S8 TIMELINE -->
-      <div class="scene clip" id="s8" data-start="63" data-duration="10" data-track-index="0">
+      <div class="scene clip" id="s8" data-start="70" data-duration="10" data-track-index="0">
         <div class="pad">
           <div class="kicker" id="s8-k">The route</div>
           <div class="h2" id="s8-t">September to January</div>
@@ -336,7 +373,7 @@
       </div>
 
       <!-- S9 CTA -->
-      <div class="scene clip" id="s9" data-start="73" data-duration="7" data-track-index="0">
+      <div class="scene clip" id="s9" data-start="80" data-duration="7" data-track-index="0">
         <div class="ctawrap">
           <div class="ctaq" id="s9-q">Tell me what you'd change.</div>
           <div class="ctasub" id="s9-s">
@@ -382,48 +419,57 @@
         .fromTo("#s4-cv", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.65, ease: E }, 23.2)
         .to("#s4 .pad", { opacity: 0, duration: 0.4 }, 29.55);
 
-      /* S5 */
+      /* S5 tools  30 - 42 */
       tl.fromTo("#s5-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 30.1)
-        .fromTo("#s5-tools .tool", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.24, ease: E }, 30.35)
-        .fromTo("#s5-shots .tshot", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.14, ease: E }, 32.4)
-        .fromTo("#s5-n", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.55, ease: E }, 33.6)
-        .to("#s5 .pad", { opacity: 0, duration: 0.4 }, 43.05);
+        .fromTo("#s5-tools .tool", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.55, stagger: 0.22, ease: E }, 30.35)
+        .fromTo("#s5-shots .tshot", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.13, ease: E }, 32.3)
+        .fromTo("#s5-n", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.55, ease: E }, 33.4)
+        .to("#s5 .pad", { opacity: 0, duration: 0.4 }, 41.55);
 
-      /* S6 */
-      tl.fromTo("#s6-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 43.6)
-        .fromTo("#s6-c1", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 43.8)
-        .fromTo("#s6-c2", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 44.1)
-        .to("#s6 .pad", { opacity: 0, duration: 0.4 }, 50.05);
+      /* S6 dates  42 - 48.5 */
+      tl.fromTo("#s6-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 42.1)
+        .fromTo("#s6-c1", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 42.3)
+        .fromTo("#s6-c2", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 42.6)
+        .to("#s6 .pad", { opacity: 0, duration: 0.4 }, 48.05);
 
-      /* S7 */
-      tl.fromTo("#s7-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 50.6)
-        .fromTo("#s7-cv", { opacity: 0, x: -38 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, 50.8)
-        .fromTo("#s7-ce", { opacity: 0, x: 38 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, 51.0)
-        .fromTo("#s7-cv .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.2, ease: E }, 51.4)
-        .fromTo("#s7-ce .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.2, ease: E }, 51.6)
-        .fromTo("#s7-s", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 53.4)
-        .to("#s7 .pad", { opacity: 0, duration: 0.4 }, 62.55);
+      /* SP points  48.5 - 57.5 */
+      tl.fromTo("#sp-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 48.6)
+        .fromTo("#sp-bars .bar", { opacity: 0, x: -22 }, { opacity: 1, x: 0, duration: 0.45, stagger: 0.075, ease: E }, 48.85);
+      document.querySelectorAll("#sp-bars .bfill").forEach((el, i) => {
+        tl.to(el, { width: el.dataset.w + "%", duration: 0.8, ease: "power2.out" }, 49.05 + i * 0.075);
+      });
+      tl.fromTo("#sp-n", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 51.4)
+        .to("#sp .pad", { opacity: 0, duration: 0.4 }, 57.05);
 
-      /* S8 */
-      tl.fromTo("#s8-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 63.1)
-        .fromTo("#s8-t", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 63.25)
-        .fromTo("#s8-tl .month", { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.06 }, 63.6)
-        .fromTo("#s8-tl .gridline", { opacity: 0 }, { opacity: 0.55, duration: 0.5, stagger: 0.05 }, 63.7)
-        .fromTo("#s8-tl .tlrowlab", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.42, stagger: 0.14, ease: E }, 63.9);
+      /* S7 split  57.5 - 70 */
+      tl.fromTo("#s7-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 57.6)
+        .fromTo("#s7-cv", { opacity: 0, x: -38 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, 57.8)
+        .fromTo("#s7-ce", { opacity: 0, x: 38 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, 58.0)
+        .fromTo("#s7-cv .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.2, ease: E }, 58.4)
+        .fromTo("#s7-ce .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.2, ease: E }, 58.6)
+        .fromTo("#s7-s", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 60.4)
+        .to("#s7 .pad", { opacity: 0, duration: 0.4 }, 69.55);
+
+      /* S8 timeline  70 - 80 */
+      tl.fromTo("#s8-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 70.1)
+        .fromTo("#s8-t", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 70.25)
+        .fromTo("#s8-tl .month", { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.06 }, 70.6)
+        .fromTo("#s8-tl .gridline", { opacity: 0 }, { opacity: 0.55, duration: 0.5, stagger: 0.05 }, 70.7)
+        .fromTo("#s8-tl .tlrowlab", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.42, stagger: 0.14, ease: E }, 70.9);
       document.querySelectorAll("#s8-tl .mbar").forEach((el, i) => {
         el.style.left = el.dataset.l + "%";
-        tl.fromTo(el, { opacity: 0, width: "0%" }, { opacity: 1, width: el.dataset.w + "%", duration: 0.5, ease: "power2.out" }, 64.05 + i * 0.14);
+        tl.fromTo(el, { opacity: 0, width: "0%" }, { opacity: 1, width: el.dataset.w + "%", duration: 0.5, ease: "power2.out" }, 71.05 + i * 0.14);
       });
-      tl.fromTo("#s8-f1", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.45, ease: E, transformOrigin: "top center" }, 66.2)
-        .fromTo("#s8-l1", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 66.35)
-        .fromTo("#s8-f2", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.45, ease: E, transformOrigin: "top center" }, 66.8)
-        .fromTo("#s8-l2", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 66.95)
-        .to("#s8 .pad", { opacity: 0, duration: 0.4 }, 72.55);
+      tl.fromTo("#s8-f1", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.45, ease: E, transformOrigin: "top center" }, 73.2)
+        .fromTo("#s8-l1", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 73.35)
+        .fromTo("#s8-f2", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.45, ease: E, transformOrigin: "top center" }, 73.8)
+        .fromTo("#s8-l2", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 73.95)
+        .to("#s8 .pad", { opacity: 0, duration: 0.4 }, 79.55);
 
-      /* S9 */
-      tl.fromTo("#s9-q", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.75, ease: E }, 73.15)
-        .fromTo("#s9-s", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 73.5)
-        .fromTo("#s9-r", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 73.9);
+      /* S9 cta  80 - 87 */
+      tl.fromTo("#s9-q", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.75, ease: E }, 80.15)
+        .fromTo("#s9-s", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 80.5)
+        .fromTo("#s9-r", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 80.9);
 
       window.__timelines["main"] = tl;
       tl.seek(0);
