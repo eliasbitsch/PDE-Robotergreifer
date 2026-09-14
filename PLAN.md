@@ -90,7 +90,7 @@ der wichtigste Planungsinput überhaupt:
 | Konzeptskizze des Greifers | 10 | Viktoriia |
 | Berechnung und mechanische Auslegung des Greifmechanismus | 10 | Viktoriia |
 | Analytische Berechnung der Greiferzange | 10 | Viktoriia |
-| Numerische Berechnung der Greiferzange | 10 | Viktoriia |
+| Numerische Berechnung der Greiferzange (FEM) | 10 | Elias |
 | Baugruppenzeichnung inklusive Stückliste | 10 | Elias |
 | Kollisionskontrolle und visuelle Darstellung des Arbeitsablaufes | 10 | Elias |
 
@@ -131,7 +131,9 @@ Niemand bekommt Restarbeiten.
 | E2 | **Greifer-Grundkörper** | Gehäuse, Antriebseinheit (Servo + Getriebe + Bremse), Ritzel/Zahnstange, Führung, Schnellwechsler, Roboterflansch ISO 9409-1-50-4-M6 | `Elias/02_CAD_Grundkoerper` |
 | E3 | **Baugruppenzeichnung & Stückliste** | A3-Zeichnung, Positionsnummern, Stückliste mit Kauf-/Fertigungsteilen | `Elias/03_Zeichnung` |
 | E4 | **Ablaufsimulation & Kollisionskontrolle** | MuJoCo-Modell, Bahn Entnahme → Ablage, Kollisionsprotokoll, Ablaufvideo | `Elias/04_Simulation` |
-| E5 | **Infrastruktur** | Repo, Onshape-Dokument, MCP-Anbindung, Parametertabelle, Doku-Vorlage | `gemeinsam/` |
+| E5 | **FEM der Greiferzange** | Netz, Randbedingungen, Netzkonvergenz, Spannung und Verformung; Abgleich gegen Viktoriias analytische Rechnung | `Elias/05_FEM` |
+| E6 | **FDM-Validierung** | Zange drucken, Durchbiegung messen, gegen die FEM halten | `Elias/06_FDM` |
+| E7 | **Infrastruktur** | Repo, Onshape-Dokument, MCP-Anbindung, Parametertabelle, Doku-Vorlage | `gemeinsam/` |
 
 ### Viktoriia — Auslegung & Nachweis
 
@@ -140,12 +142,13 @@ Niemand bekommt Restarbeiten.
 | V1 | **Greifkonzept & Konzeptskizze** | Variantenvergleich nach VDI 2225 (Parallel/Winkel/Vakuum/Magnet), Begründung der Wahl, bemaßte Konzeptskizze | `Viktoriia/01_Konzept` |
 | V2 | **Greifkraft & Antriebsauslegung** | Kraftbilanz (Gewicht + Beschleunigung + Sicherheit), Reibwert mit Quelle, Flächenpressung auf PA 6, Ritzelmoment, Motorauswahl mit Reserve, Bremsenauslegung | `Viktoriia/02_Auslegung` |
 | V3 | **Greiferzange & Weichbacken (CAD)** | Parametrische Zange in Onshape, Backentasche, Kontur passend zu Bauteil B | `Viktoriia/03_CAD_Zange` |
-| V4 | **Festigkeitsnachweis analytisch + FEM** | Biegespannung und Durchbiegung analytisch, FEM mit Netzkonvergenz, Vergleich beider Wege mit Abweichungsdiskussion | `Viktoriia/04_Nachweis` |
-| V5 | **FDM-Validierung** | Zange drucken, Greifversuch, Durchbiegung messen, gegen FEM halten | `Viktoriia/05_FDM` |
+| V4 | **Analytischer Festigkeitsnachweis** | Biegespannung und Durchbiegung der Zange von Hand gerechnet, Annahmen und Quellen sauber belegt — die Referenz, gegen die die FEM antritt | `Viktoriia/04_Nachweis` |
 
-**Warum dieser Schnitt:** Viktoriia konstruiert genau das Bauteil, das sie
-danach berechnet, prüft und druckt — Zange und Backen. Elias baut alles
-drumherum und bringt es zum Laufen. Die Schnittstelle zwischen beiden ist eine
+**Warum dieser Schnitt:** Viktoriia konstruiert die Zange und rechnet sie
+analytisch durch. Elias rechnet dieselbe Zange numerisch nach. Damit prüfen
+zwei Personen unabhängig dasselbe Bauteil auf zwei Wegen — genau das verlangt
+die Angabe, und eine Abweichung fällt sofort auf, statt sich in einer Hand zu
+verstecken. Die Schnittstelle zwischen beiden ist eine
 einzige Fläche: die **Anschraubebene Schlitten ↔ Zange**. Die wird in KW 41
 festgelegt und danach nicht mehr angefasst.
 
