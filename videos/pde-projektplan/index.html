@@ -209,20 +209,18 @@
 
       <!-- S4 WHY -->
       <div class="scene clip" id="s4" data-start="21" data-duration="9" data-track-index="0">
-        <div class="pad" style="justify-content: center">
-          <div class="kicker" id="s4-k">Why this gripper</div>
-          <div class="why2">
-            <div class="wcard" id="s4-c1">
-              <div class="t">2-finger parallel jaws</div>
-              <div class="r">Two flat faces, opposed. <b>Friction is enough</b> — no form fit, no custom kinematics.</div>
-            </div>
-            <div class="wcard" id="s4-c2">
-              <div class="t">Servo drive</div>
-              <div class="r"><b>Force is adjustable.</b> PA 6 is soft and Ra 1.6 has to survive. No compressed air needed.</div>
+        <div class="pad">
+          <div class="kicker" id="s4-k">Why this gripper — Robotiq style</div>
+          <div class="partwrap">
+            <img class="partimg" id="s4-img" src="assets/part/linkage.png" alt="Four-bar linkage" />
+            <div class="facts" id="s4-f">
+              <div class="fact hi"><div class="v" style="font-size: 46px">four-bar linkage</div><div class="k">one per finger, pads stay parallel</div></div>
+              <div class="fact"><div class="v" style="font-size: 46px">servo + screw</div><div class="k">adjustable force · self-locking, so no brake</div></div>
+              <div class="fact"><div class="v mono">14.3 N</div><div class="k">what we need · a 2F-85 does 20–235 N</div></div>
             </div>
           </div>
           <div class="caveat" id="s4-cv">
-            The price: rack and pinion is <b>not self-locking</b>. Power fails, part drops — so a holding brake is mandatory, not optional.
+            The price: jaw force is <b>not constant</b> over the stroke — the worst transmission angle has to be proven, not assumed.
           </div>
         </div>
       </div>
@@ -428,9 +426,9 @@
 
       /* S4 */
       tl.fromTo("#s4-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 21.1)
-        .fromTo("#s4-c1", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 21.35)
-        .fromTo("#s4-c2", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: E }, 21.75)
-        .fromTo("#s4-cv", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.65, ease: E }, 23.2)
+        .fromTo("#s4-img", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.9, ease: E }, 21.25)
+        .fromTo("#s4-f .fact", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.55, stagger: 0.3, ease: E }, 21.8)
+        .fromTo("#s4-cv", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.65, ease: E }, 24.2)
         .to("#s4 .pad", { opacity: 0, duration: 0.4 }, 29.55);
 
       /* S5 tools  30 - 42 */

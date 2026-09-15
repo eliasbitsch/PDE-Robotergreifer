@@ -24,15 +24,22 @@ der Ordnerstruktur aus Abb. 2 der Angabe.
 
 ## 2. Technische Festlegungen
 
-Diese fünf Entscheidungen stehen aus der Vorarbeit fest. Wenn Viktoriia eine
-davon anders sieht, ist jetzt der richtige Zeitpunkt — nach dem Design Freeze
-in KW 40 kostet jede Änderung die halbe Kette.
+Sechs Entscheidungen. Wenn Viktoriia eine davon anders sieht, ist **jetzt** der
+richtige Zeitpunkt — nach dem Design Freeze in KW 40 kostet jede Änderung die
+halbe Kette.
+
+> **Geändert am 15.09.2026:** Die Mechanik war zuerst Zahnstange–Ritzel. Der
+> Variantenvergleich in `cad/mechanismus.py` hatte mit Zahnstange, Keilhaken und
+> Trapezspindel nur direkt übersetzende Schubmechanismen im Feld — die Familie
+> der Gelenkgetriebe fehlte. Mit dem Viergelenk dazu kippt das Ergebnis, vor
+> allem beim Kriterium „Halten bei Energieausfall": die selbsthemmende Spindel
+> erspart die Haltebremse, die die Zahnstange zwingend gebraucht hätte.
 
 | Thema | Festlegung | Warum |
 |---|---|---|
-| **Greifkonzept** | 2-Finger-Parallelgreifer, Backen | Bauteil B hat zwei ebene, parallele Seitenflächen im Abstand 70 mm. Formschluss ist nicht nötig, Reibschluss reicht. Einfachste Lösung, die die Aufgabe erfüllt. |
-| **Antrieb** | **Servomotor** mit Planetengetriebe und Haltebremse | Regelbare Greifkraft (PA 6 ist weich, Ra 1,6 darf nicht leiden), leise, keine Druckluftinfrastruktur. Preis: nicht selbsthemmend → Haltebremse ist zwingend, nicht optional. |
-| **Mechanik** | Zahnstange–Ritzel, 1:1 synchron | 12,5 mm Backenhub brauchen nur ~72° Ritzeldrehung. Eine Trapezspindel bräuchte 6 Umdrehungen und bei 0,3 s Schließzeit über 1000 1/min. |
+| **Greifkonzept** | 2-Finger-Parallelgreifer, Backen | Bauteil B hat zwei ebene, parallele Seitenflächen im Abstand 70 mm. Formschluss ist nicht nötig, Reibschluss reicht. |
+| **Antrieb** | **Servomotor** mit selbsthemmender Spindel bzw. Schnecke | Regelbare Greifkraft (PA 6 ist weich, Ra 1,6 darf nicht leiden), leise, keine Druckluft. **Selbsthemmend → keine Haltebremse nötig.** Das war bei der Zahnstange noch zwingend. |
+| **Mechanik** | **Viergelenk (Parallelogramm) je Finger**, ein Motor treibt beide | Bauform nach Vorbild Robotiq 2F-85. Backen bleiben parallel, Spitze läuft auf einer Kreisbahn. Ohne die unteraktuierte Adaptivität des Originals — die ist im umgreifenden Modus statisch unbestimmt und bringt für zwei ebene Flächen nichts. |
 | **CAD + FEM** | **Onshape** (parametrisch, browserbasiert) | Beide sehen dasselbe Modell live, keine Versionskonflikte, keine lokale Installation. FEM direkt am selben Modell, ohne Exportbruch. |
 | **Berechnung / Doku** | **LaTeX** | Formeln, Einheiten und Querverweise bleiben konsistent; die Doku ist 10 Punkte wert und wächst ab M1 mit. |
 | **Simulation** | **MuJoCo** | Siehe Abschnitt 3. |
@@ -43,6 +50,13 @@ in KW 40 kostet jede Änderung die halbe Kette.
 - Greifflächen: ±X, Backenabstand **70 mm**, 6200 mm² je Seite
 - Bahnbeschleunigung aus Taktzeitbudget: **2,05 m/s²**
 - Erforderliche Greifkraft: **14,3 N je Backe** (µ = 0,5 NBR/PA 6, S = 2,0)
+- Startgeometrie Viergelenk (in V2 zu bestätigen): Lenkerlänge **90 mm**,
+  Schwenkwinkel **±4,46°** um die Senkrechte zur Greifrichtung, Hub **14 mm je
+  Seite** → **0,27 mm** Belagversatz über den Hub. Längere Lenker senken den
+  Versatz weiter (120 mm → 0,20 mm), kürzere erhöhen ihn (40 mm → 0,62 mm).
+- Referenz Robotiq 2F-85: elektrisch 24 V, **20–235 N**, 85 mm Hub, 5 kg
+  Traglast, ~1,3 kg, Flansch ISO 9409-1-50-4-M6. Kraft ist in keiner Variante
+  der Engpass — wir brauchen 14,3 N.
 - Roboter: **ABB IRB 1600-6/1.45**
 - Wichtigster Befund: Mit dem Roboter mittig auf dem Boden ist der Ablauf
   **nicht ausführbar** — nicht wegen der Reichweite, sondern wegen Achse 5
@@ -129,7 +143,7 @@ Niemand bekommt Restarbeiten.
 | # | Paket | Ergebnis | Ordner |
 |---|---|---|---|
 | E1 | **Roboterauswahl & Aufstellung** | Auswahlrechnung (Reichweite, Taktzeit, Traglast), Aufstellungsstudie Sockel/Basisversatz, Nachweis der Erreichbarkeit aller Stützpunkte | `Elias/01_Roboter` |
-| E2 | **Greifer-Grundkörper** | Gehäuse, Antriebseinheit (Servo + Getriebe + Bremse), Ritzel/Zahnstange, Führung, Schnellwechsler, Roboterflansch ISO 9409-1-50-4-M6 | `Elias/02_CAD_Grundkoerper` |
+| E2 | **Greifer-Grundkörper** | Gehäuse, Antriebseinheit (Servo + selbsthemmende Spindel), Viergelenk mit Lagerstellen, Schnellwechsler, Roboterflansch ISO 9409-1-50-4-M6 | `Elias/02_CAD_Grundkoerper` |
 | E3 | **Baugruppenzeichnung & Stückliste** | A3-Zeichnung, Positionsnummern, Stückliste mit Kauf-/Fertigungsteilen | `Elias/03_Zeichnung` |
 | E4 | **Ablaufsimulation & Kollisionskontrolle** | MuJoCo-Modell, Bahn Entnahme → Ablage, Kollisionsprotokoll, Ablaufvideo | `Elias/04_Simulation` |
 | E5 | **FEM der Greiferzange** | Netz, Randbedingungen, Netzkonvergenz, Spannung und Verformung; Abgleich gegen Viktoriias analytische Rechnung | `Elias/05_FEM` |
@@ -139,8 +153,8 @@ Niemand bekommt Restarbeiten.
 
 | # | Paket | Ergebnis | Ordner |
 |---|---|---|---|
-| V1 | **Greifkonzept & Konzeptskizze** | Variantenvergleich nach VDI 2225 (Parallel/Winkel/Vakuum/Magnet), Begründung der Wahl, bemaßte Konzeptskizze | `Viktoriia/01_Konzept` |
-| V2 | **Greifkraft & Antriebsauslegung** | Kraftbilanz (Gewicht + Beschleunigung + Sicherheit), Reibwert mit Quelle, Flächenpressung auf PA 6, Ritzelmoment, Motorauswahl mit Reserve, Bremsenauslegung | `Viktoriia/02_Auslegung` |
+| V1 | **Greifkonzept & Konzeptskizze** | Variantenvergleich nach VDI 2225 — **mit dem Robotiq 2F-85 als marktüblicher Referenz im Feld**, dazu Viergelenk, Zahnstange, Keilhaken, Spindel. Begründung der Wahl, bemaßte Konzeptskizze | `Viktoriia/01_Konzept` |
+| V2 | **Greifkraft & Antriebsauslegung** | Kraftbilanz (Gewicht + Beschleunigung + Sicherheit), Reibwert mit Quelle, Flächenpressung auf PA 6, **Viergelenk über virtuelle Arbeit mit Nachweis des Übertragungswinkels im ungünstigsten Punkt**, Spindelauslegung inkl. Selbsthemmung, Motorauswahl mit Reserve | `Viktoriia/02_Auslegung` |
 | V3 | **Greiferzange & Weichbacken (CAD)** | Parametrische Zange in Onshape, Backentasche, Kontur passend zu Bauteil B | `Viktoriia/03_CAD_Zange` |
 | V4 | **Analytischer Festigkeitsnachweis** | Biegespannung und Durchbiegung der Zange von Hand gerechnet, Annahmen und Quellen sauber belegt — die Referenz, gegen die die FEM antritt | `Viktoriia/04_Nachweis` |
 | V5 | **FDM-Validierung** | Zange drucken, Durchbiegung unter definierter Last messen, gegen Elias' FEM halten | `Viktoriia/05_FDM` |
@@ -272,7 +286,12 @@ Diese müssen früh geklärt werden, weil sie nach hinten teuer werden:
    Orientierung anders ist, ändert sich die Bahn und möglicherweise die
    Greifrichtung.
 3. **FDM-Drucker.** Verfügbarkeit und Werkstoff klären (Labor oder privat).
-3a. **Onshape-FEM.** Prüfen, ob der Education-Plan die Simulation freischaltet.
+3a. **Übertragungswinkel.** Beim Viergelenk ist die Backenkraft **nicht**
+   konstant über den Hub. Der ungünstigste Punkt muss nachgewiesen werden —
+   das ist der Preis für die Bauform und gehört in V2, nicht ans Ende.
+3b. **Belagversatz auf der Greiffläche.** 0,27 mm Schrubben bei 90 mm Lenkern.
+   Für Ra 1,6 auf PA 6 nachweisen, dass der Weichbelag das elastisch aufnimmt.
+3c. **Onshape-FEM.** Prüfen, ob der Education-Plan die Simulation freischaltet.
    Falls nicht, springt die bestehende CalculiX-Kette ein — Ergebnis
    gleichwertig, nur mehr Handarbeit.
 4. **Onshape-Lizenz.** Free-Plan macht Dokumente öffentlich. Für eine
