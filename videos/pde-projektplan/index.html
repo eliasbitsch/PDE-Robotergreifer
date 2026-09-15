@@ -113,6 +113,15 @@
       .tag { font-size: 20px; font-weight: 700; padding: 5px 11px; border-radius: 7px; background: var(--panel2); color: var(--muted); min-width: 46px; text-align: center; }
       .col.e .tag { color: var(--elias); }
       .col.v .tag { color: var(--vik); }
+      .pts { margin-left: auto; font-size: 22px; color: var(--muted); white-space: nowrap; }
+      .pts.sh { color: var(--green); }
+      .pts.bo { color: var(--muted); font-style: italic; }
+      .total { display: flex; justify-content: space-between; margin-top: 26px;
+               border-top: 1px solid var(--line); padding-top: 18px; font-size: 24px; }
+      .total .l { color: var(--muted); }
+      .total .r { font-weight: 700; }
+      .seamdoc { margin-top: 30px; text-align: center; font-size: 25px; color: var(--muted); }
+      .seamdoc b { color: var(--green); font-weight: 700; }
       .seam { margin-top: 36px; text-align: center; font-size: 27px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 28px; }
       .seam b { color: var(--green); font-weight: 600; }
 
@@ -305,24 +314,29 @@
               <div class="colname" style="color: var(--vik)">Viktoriia</div>
               <div class="colrole">Design &amp; analytical proof</div>
               <div class="items">
-                <div class="item"><span class="tag">V1</span><span>Gripping concept + sketch</span></div>
-                <div class="item"><span class="tag">V2</span><span>Gripping force + drive sizing</span></div>
-                <div class="item"><span class="tag">V3</span><span>Jaws + soft pads (CAD)</span></div>
-                <div class="item"><span class="tag">V4</span><span>Analytical stress + deflection</span></div>
-                <div class="item"><span class="tag">V5</span><span>3D-printed check vs. FEM</span></div>
+                <div class="item"><span class="tag">V1</span><span>Gripping concept + sketch</span><span class="pts">10 P</span></div>
+                <div class="item"><span class="tag">V2</span><span>Gripping force + drive sizing</span><span class="pts">10 P</span></div>
+                <div class="item"><span class="tag">V3</span><span>Jaws + soft pads (CAD)</span><span class="pts sh">20 P · both</span></div>
+                <div class="item"><span class="tag">V4</span><span>Analytical stress + deflection</span><span class="pts">10 P</span></div>
+                <div class="item"><span class="tag">V5</span><span>3D-printed check vs. FEM</span><span class="pts bo">bonus</span></div>
               </div>
+              <div class="total"><span class="l">own packages</span><span class="r" style="color: var(--vik)">30 P + shared CAD</span></div>
             </div>
             <div class="col e" id="s7-ce">
               <div class="colname" style="color: var(--elias)">Elias</div>
               <div class="colrole">System &amp; numerical proof</div>
               <div class="items">
-                <div class="item"><span class="tag">E1</span><span>Robot selection + placement</span></div>
-                <div class="item"><span class="tag">E2</span><span>Gripper body, drive, changer</span></div>
-                <div class="item"><span class="tag">E3</span><span>Assembly drawing + BOM</span></div>
-                <div class="item"><span class="tag">E4</span><span>Motion + collision study</span></div>
-                <div class="item"><span class="tag">E5</span><span>FEM of the jaws</span></div>
+                <div class="item"><span class="tag">E1</span><span>Robot selection + placement</span><span class="pts">10 P</span></div>
+                <div class="item"><span class="tag">E2</span><span>Gripper body, drive, changer</span><span class="pts sh">20 P · both</span></div>
+                <div class="item"><span class="tag">E3</span><span>Assembly drawing + BOM</span><span class="pts">10 P</span></div>
+                <div class="item"><span class="tag">E4</span><span>Motion + collision study</span><span class="pts">10 P</span></div>
+                <div class="item"><span class="tag">E5</span><span>FEM of the jaws</span><span class="pts">10 P</span></div>
               </div>
+              <div class="total"><span class="l">own packages</span><span class="r" style="color: var(--elias)">40 P + shared CAD</span></div>
             </div>
+          </div>
+          <div class="seamdoc" id="s7-d">
+            Plus <b>10 P for the documentation itself</b> — written by both, package by package, not in January.
           </div>
           <div class="seam" id="s7-s">
             You prove the jaws by hand and on the printer. I prove them numerically. <b>Nobody checks their own homework.</b>
@@ -445,9 +459,11 @@
       tl.fromTo("#s7-k", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 57.6)
         .fromTo("#s7-cv", { opacity: 0, x: -38 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, 57.8)
         .fromTo("#s7-ce", { opacity: 0, x: 38 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, 58.0)
-        .fromTo("#s7-cv .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.2, ease: E }, 58.4)
+        .fromTo("#s7-cv .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.18, ease: E }, 58.4)
+        .fromTo("#s7 .total", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: E }, 59.9)
         .fromTo("#s7-ce .item", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.2, ease: E }, 58.6)
-        .fromTo("#s7-s", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 60.4)
+        .fromTo("#s7-d", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55, ease: E }, 60.2)
+        .fromTo("#s7-s", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 60.7)
         .to("#s7 .pad", { opacity: 0, duration: 0.4 }, 69.55);
 
       /* S8 timeline  70 - 80 */
